@@ -1,0 +1,80 @@
+2014-04-04 10:59:24,374 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 10:59:24,412 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 11:01:59,828 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 11:01:59,859 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 11:02:27,828 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 11:02:27,859 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 11:04:11,000 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 11:04:11,030 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 11:05:45,882 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 11:05:45,912 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 11:09:06,422 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 11:09:06,451 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 11:09:17,315 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 11:09:17,347 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 16:31:56,503 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 16:31:56,534 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 16:40:26,354 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 16:40:26,384 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 16:44:14,980 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 16:44:15,020 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 16:47:36,857 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 16:47:36,887 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 16:57:38,717 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 16:57:38,746 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:04:20,828 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:04:20,857 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:06:12,744 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:06:12,790 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:07:14,656 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:07:14,690 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:09:57,887 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:09:57,917 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:34:26,251 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:34:26,285 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:35:16,611 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:35:16,651 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:36:58,634 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:36:58,663 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:39:46,407 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:39:46,449 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:42:58,450 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:42:58,479 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:48:05,251 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:48:05,280 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:48:59,400 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:48:59,443 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:49:49,082 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:49:49,113 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:50:49,393 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:50:49,422 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:51:49,681 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:51:49,712 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:54:56,526 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:54:56,576 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:56:34,897 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:56:34,926 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:58:27,369 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:58:27,400 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 17:59:40,374 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 17:59:40,410 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 18:01:26,229 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 18:01:26,259 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 18:06:10,758 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 18:06:10,788 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 18:07:18,182 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 18:07:18,212 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 18:14:06,917 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 18:14:06,950 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 18:15:11,623 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 18:15:11,653 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 18:16:26,370 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 18:16:26,428 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 19:08:07,888 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 19:08:07,921 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 19:09:02,912 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 19:09:02,956 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 19:17:05,045 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 19:17:05,081 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-04-04 19:19:16,184 INFO  segment.SegmentReader - SegmentReader: splitContent 'E:/NOVA10.1.2/TestCrawl/segments/20140403230718'
+2014-04-04 19:19:16,216 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable

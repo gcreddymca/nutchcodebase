@@ -1,0 +1,78 @@
+2014-03-25 14:42:28,208 INFO  crawl.Injector - Injector: starting at 2014-03-25 14:42:28
+2014-03-25 14:42:28,208 INFO  crawl.Injector - Injector: crawlDb: E:/NOVA10.1.2/crawldb
+2014-03-25 14:42:28,208 INFO  crawl.Injector - Injector: urlDir: E:/NOVA10.1.2/urls
+2014-03-25 14:42:28,209 INFO  crawl.Injector - Injector: Converting injected urls to crawl db entries.
+2014-03-25 14:42:28,343 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-03-25 14:42:28,344 ERROR security.UserGroupInformation - PriviledgedActionException as:user cause:java.io.IOException: Failed to set permissions of path: \tmp\hadoop-user\mapred\staging\user686097015\.staging to 0700
+2014-03-25 14:42:28,344 ERROR crawl.Injector - Injector: java.io.IOException: Failed to set permissions of path: \tmp\hadoop-user\mapred\staging\user686097015\.staging to 0700
+	at org.apache.hadoop.fs.FileUtil.checkReturnValue(FileUtil.java:691)
+	at org.apache.hadoop.fs.FileUtil.setPermission(FileUtil.java:664)
+	at org.apache.hadoop.fs.RawLocalFileSystem.setPermission(RawLocalFileSystem.java:514)
+	at org.apache.hadoop.fs.RawLocalFileSystem.mkdirs(RawLocalFileSystem.java:349)
+	at org.apache.hadoop.fs.FilterFileSystem.mkdirs(FilterFileSystem.java:193)
+	at org.apache.hadoop.mapreduce.JobSubmissionFiles.getStagingDir(JobSubmissionFiles.java:126)
+	at org.apache.hadoop.mapred.JobClient$2.run(JobClient.java:942)
+	at org.apache.hadoop.mapred.JobClient$2.run(JobClient.java:936)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:396)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1190)
+	at org.apache.hadoop.mapred.JobClient.submitJobInternal(JobClient.java:936)
+	at org.apache.hadoop.mapred.JobClient.submitJob(JobClient.java:910)
+	at org.apache.hadoop.mapred.JobClient.runJob(JobClient.java:1353)
+	at org.apache.nutch.crawl.Injector.inject(Injector.java:279)
+	at org.apache.nutch.crawl.Injector.run(Injector.java:316)
+	at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:65)
+	at org.apache.nutch.crawl.Injector.main(Injector.java:306)
+
+2014-03-25 14:44:51,419 INFO  crawl.Injector - Injector: starting at 2014-03-25 14:44:51
+2014-03-25 14:44:51,419 INFO  crawl.Injector - Injector: crawlDb: E:/NOVA10.1.2/crawldb
+2014-03-25 14:44:51,419 INFO  crawl.Injector - Injector: urlDir: E:/NOVA10.1.2/urls
+2014-03-25 14:44:51,420 INFO  crawl.Injector - Injector: Converting injected urls to crawl db entries.
+2014-03-25 14:44:51,557 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-03-25 14:44:51,558 ERROR security.UserGroupInformation - PriviledgedActionException as:user cause:java.io.IOException: Failed to set permissions of path: E:\NOVA10.1.2\mapred\staging\user617734397\.staging to 0700
+2014-03-25 14:44:51,558 ERROR crawl.Injector - Injector: java.io.IOException: Failed to set permissions of path: E:\NOVA10.1.2\mapred\staging\user617734397\.staging to 0700
+	at org.apache.hadoop.fs.FileUtil.checkReturnValue(FileUtil.java:691)
+	at org.apache.hadoop.fs.FileUtil.setPermission(FileUtil.java:664)
+	at org.apache.hadoop.fs.RawLocalFileSystem.setPermission(RawLocalFileSystem.java:514)
+	at org.apache.hadoop.fs.RawLocalFileSystem.mkdirs(RawLocalFileSystem.java:349)
+	at org.apache.hadoop.fs.FilterFileSystem.mkdirs(FilterFileSystem.java:193)
+	at org.apache.hadoop.mapreduce.JobSubmissionFiles.getStagingDir(JobSubmissionFiles.java:126)
+	at org.apache.hadoop.mapred.JobClient$2.run(JobClient.java:942)
+	at org.apache.hadoop.mapred.JobClient$2.run(JobClient.java:936)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:396)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1190)
+	at org.apache.hadoop.mapred.JobClient.submitJobInternal(JobClient.java:936)
+	at org.apache.hadoop.mapred.JobClient.submitJob(JobClient.java:910)
+	at org.apache.hadoop.mapred.JobClient.runJob(JobClient.java:1353)
+	at org.apache.nutch.crawl.Injector.inject(Injector.java:279)
+	at org.apache.nutch.crawl.Injector.run(Injector.java:316)
+	at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:65)
+	at org.apache.nutch.crawl.Injector.main(Injector.java:306)
+
+2014-03-25 14:46:27,438 INFO  crawl.Injector - Injector: starting at 2014-03-25 14:46:27
+2014-03-25 14:46:27,438 INFO  crawl.Injector - Injector: crawlDb: E:/NOVA10.1.2/crawldb
+2014-03-25 14:46:27,438 INFO  crawl.Injector - Injector: urlDir: E:/NOVA10.1.2/urls
+2014-03-25 14:46:27,439 INFO  crawl.Injector - Injector: Converting injected urls to crawl db entries.
+2014-03-25 14:46:27,579 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2014-03-25 14:46:27,579 ERROR security.UserGroupInformation - PriviledgedActionException as:user cause:java.io.IOException: Failed to set permissions of path: E:\NOVA10.1.2\mapred\staging\user1138280994\.staging to 0700
+2014-03-25 14:46:27,580 ERROR crawl.Injector - Injector: java.io.IOException: Failed to set permissions of path: E:\NOVA10.1.2\mapred\staging\user1138280994\.staging to 0700
+	at org.apache.hadoop.fs.FileUtil.checkReturnValue(FileUtil.java:691)
+	at org.apache.hadoop.fs.FileUtil.setPermission(FileUtil.java:664)
+	at org.apache.hadoop.fs.RawLocalFileSystem.setPermission(RawLocalFileSystem.java:514)
+	at org.apache.hadoop.fs.RawLocalFileSystem.mkdirs(RawLocalFileSystem.java:349)
+	at org.apache.hadoop.fs.FilterFileSystem.mkdirs(FilterFileSystem.java:193)
+	at org.apache.hadoop.mapreduce.JobSubmissionFiles.getStagingDir(JobSubmissionFiles.java:126)
+	at org.apache.hadoop.mapred.JobClient$2.run(JobClient.java:942)
+	at org.apache.hadoop.mapred.JobClient$2.run(JobClient.java:936)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.Subject.doAs(Subject.java:396)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1190)
+	at org.apache.hadoop.mapred.JobClient.submitJobInternal(JobClient.java:936)
+	at org.apache.hadoop.mapred.JobClient.submitJob(JobClient.java:910)
+	at org.apache.hadoop.mapred.JobClient.runJob(JobClient.java:1353)
+	at org.apache.nutch.crawl.Injector.inject(Injector.java:279)
+	at org.apache.nutch.crawl.Injector.run(Injector.java:316)
+	at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:65)
+	at org.apache.nutch.crawl.Injector.main(Injector.java:306)
+
