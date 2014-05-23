@@ -5,7 +5,8 @@ import java.util.Date;
 public class UrlVO {
 	private String url;
 	private byte status;
-	private long fetchTime;
+	private long latestFetchTime;
+	private long lastFetchTime;
 	private long modifiedTime;
 	private byte retriesSinceFetch;
 	private int fetchInterval;
@@ -25,11 +26,18 @@ public class UrlVO {
 	public void setStatus(byte status) {
 		this.status = status;
 	}
-	public long getFetchTime() {
-		return fetchTime;
+	
+	public long getLatestFetchTime() {
+		return latestFetchTime;
 	}
-	public void setFetchTime(long fetchTime) {
-		this.fetchTime = fetchTime;
+	public void setLatestFetchTime(long latestFetchTime) {
+		this.latestFetchTime = latestFetchTime;
+	}
+	public long getLastFetchTime() {
+		return lastFetchTime;
+	}
+	public void setLastFetchTime(long lastFetchTime) {
+		this.lastFetchTime = lastFetchTime;
 	}
 	public long getModifiedTime() {
 		return modifiedTime;

@@ -45,9 +45,8 @@ public class Crawler {
 	 */
 	public boolean crawlByDomain(String crawlDir, int numberOfRounds,
 			int domainId) throws Exception {
-		boolean success = false;
-		DomainDAO domainDAO = new DomainDAO();
 
+		DomainDAO domainDAO = new DomainDAO();
 		// Check if crawl is in progress
 		long count = domainDAO.checkCrawlInProgress();
 		// Throw exception if crawl is already in progress
@@ -57,6 +56,10 @@ public class Crawler {
 		if (crawlDir == null || crawlDir.length() == 0) {
 			throw new IllegalArgumentException("Missing crawl directory path");
 		}
+
+		deleteDirectory(crawlDir);
+
+		boolean success = false;
 
 		// Fetch domain that needs to be crawled
 		DomainVO domainVO = domainDAO.readByPrimaryKey(domainId);
@@ -139,6 +142,26 @@ public class Crawler {
 			}
 		}
 		return success;
+	}
+
+	/**
+	 * This method deletes a directory and its sub directories
+	 * 
+	 * @param directoryName
+	 */
+	private void deleteDirectory(String directoryName) {
+		File directoryObj = new File(directoryName);
+		if (directoryObj.exists()) {
+			String[] fileList = directoryObj.list();
+			if (fileList != null && fileList.length > 0) {
+				for (String dirName : fileList) {
+					deleteDirectory(directoryName+"/"+dirName);
+				}
+			}
+			directoryObj.delete();
+
+		}
+
 	}
 
 	/**
@@ -238,6 +261,8 @@ public class Crawler {
 		if (crawlDir == null || crawlDir.length() == 0) {
 			throw new IllegalArgumentException("Missing crawl directory path");
 		}
+		
+		deleteDirectory(crawlDir);
 
 		List<DomainVO> domainVOs = domainDAO.read();
 		Configuration conf = NutchConfiguration.create();

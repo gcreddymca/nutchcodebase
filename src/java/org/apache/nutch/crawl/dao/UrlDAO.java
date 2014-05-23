@@ -5,11 +5,14 @@ import org.apache.nutch.tools.JDBCConnector;
 import org.apache.nutch.crawl.vo.UrlVO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Date;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mortbay.log.Log;
 import org.slf4j.Logger;
@@ -33,20 +36,21 @@ public class UrlDAO {
 		int count = 0;
 		try {
 			LOG.info("Connected to UrlCRUD DB");
-			String query = "INSERT INTO URL_DETAIL (URL,STATUS,FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID) VALUES(?,?,?,?,?,?,?,?,?,?)";
+			String query = "INSERT INTO URL_DETAIL (URL,STATUS,LAST_FETCH_TIME,LATEST_FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 			stmt = conn.prepareStatement(query);
 
 			for (UrlVO url : urlVOs) {
 				stmt.setString(1, url.getUrl());
 				stmt.setInt(2, url.getStatus());
-				stmt.setTimestamp(3, new Timestamp( url.getFetchTime()));
-				stmt.setTimestamp(4, new Timestamp( url.getModifiedTime()));
-				stmt.setInt(5, url.getRetriesSinceFetch());
-				stmt.setLong(6, url.getFetchInterval());
-				stmt.setFloat(7, url.getScore());
-				stmt.setString(8, url.getSignature());
-				stmt.setString(9, url.getMetadata());
-				stmt.setInt(10, url.getSegmentId());
+				stmt.setTimestamp(3, new Timestamp( url.getLastFetchTime()));
+				stmt.setTimestamp(4, new Timestamp( url.getLatestFetchTime()));
+				stmt.setTimestamp(5, new Timestamp( url.getModifiedTime()));
+				stmt.setInt(6, url.getRetriesSinceFetch());
+				stmt.setLong(7, url.getFetchInterval());
+				stmt.setFloat(8, url.getScore());
+				stmt.setString(9, url.getSignature());
+				stmt.setString(10, url.getMetadata());
+				stmt.setInt(11, url.getSegmentId());
 				stmt.addBatch();
 				count++;
 				if (count == urlVOs.size() || count == maxStatements) {
@@ -99,19 +103,20 @@ public class UrlDAO {
 		}
 		PreparedStatement stmt = null;
 		try {
-			String query = "INSERT INTO URL_DETAIL (URL,STATUS,FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID) VALUES(?,?,?,?,?,?,?,?,?,?)";
+			String query = "INSERT INTO URL_DETAIL (URL,STATUS,LAST_FETCH_TIME,LATEST_FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 			stmt = conn.prepareStatement(query);
 
 			stmt.setString(1, url.getUrl());
 			stmt.setInt(2, url.getStatus());
-			stmt.setDate(3, new Date( url.getFetchTime()));
-			stmt.setDate(4, new Date( url.getModifiedTime()));
-			stmt.setInt(5, url.getRetriesSinceFetch());
-			stmt.setLong(6, url.getFetchInterval());
-			stmt.setFloat(7, url.getScore());
-			stmt.setString(8, url.getSignature());
-			stmt.setString(9, url.getMetadata());
-			stmt.setInt(10, url.getSegmentId());
+			stmt.setTimestamp(3, new Timestamp( url.getLastFetchTime()));
+			stmt.setTimestamp(4, new Timestamp( url.getLatestFetchTime()));
+			stmt.setTimestamp(5, new Timestamp( url.getModifiedTime()));
+			stmt.setInt(6, url.getRetriesSinceFetch());
+			stmt.setLong(7, url.getFetchInterval());
+			stmt.setFloat(8, url.getScore());
+			stmt.setString(9, url.getSignature());
+			stmt.setString(10, url.getMetadata());
+			stmt.setInt(11, url.getSegmentId());
 			stmt.execute();
 			result = true;
 		} catch (SQLException e) {
@@ -157,19 +162,20 @@ public class UrlDAO {
 		int maxStatements = 1000;
 		int count = 0;
 		try {
-			String query = "UPDATE URL_DETAIL SET STATUS=?,FETCH_TIME=?,MODIFIED_TIME=?,RETRIES_SINCE_FETCH=?,RETRY_INTERVAL=?,SCORE=?,SIGNATURE=?,METADATA=? WHERE URL=?";
+			String query = "UPDATE URL_DETAIL SET STATUS=?,LATEST_FETCH_TIME=?,MODIFIED_TIME=?,RETRIES_SINCE_FETCH=?,RETRY_INTERVAL=?,SCORE=?,SIGNATURE=?,METADATA=?,LAST_FETCH_TIME=? WHERE URL=?";
 			stmt = conn.prepareStatement(query);
 
 			for (UrlVO url : urlVOs) {
 				stmt.setInt(1, url.getStatus());
-				stmt.setTimestamp(2, new Timestamp( url.getFetchTime()));
+				stmt.setTimestamp(2, new Timestamp( url.getLatestFetchTime()));
 				stmt.setTimestamp(3, new Timestamp( url.getModifiedTime()));
 				stmt.setInt(4, url.getRetriesSinceFetch());
 				stmt.setLong(5, url.getFetchInterval());
 				stmt.setFloat(6, url.getScore());
 				stmt.setString(7, url.getSignature());
-				stmt.setString(8, url.getMetadata());
-				stmt.setString(9, url.getUrl());
+				stmt.setString(8, url.getMetadata());			
+				stmt.setTimestamp(9, new Timestamp( url.getLastFetchTime()));
+				stmt.setString(10, url.getUrl());
 				//stmt.setInt(10, url.getSegmentId());
 				stmt.addBatch();
 				count++;
@@ -256,6 +262,68 @@ public class UrlDAO {
 			}
 		}
 		return result;
+	}
+	
+	public Map<String, UrlVO> read(){
+		Connection conn = JDBCConnector.getConnection();
+		Map<String,UrlVO> result = new HashMap<String,UrlVO>();
+		if (conn == null) {
+			LOG.info("Connection not found. Could not read rows from URL_DETAIL");
+			return result;
+		}
+		Statement stmt = null;
+		UrlVO urlVO = null;
+		try {
+			String query = "SELECT * FROM URL_DETAIL";
+			stmt = conn.createStatement();
+			stmt.execute(query);
+			ResultSet rs = stmt.getResultSet();
+			while(rs.next()){
+				String url = rs.getString("URL");
+				urlVO = new UrlVO();
+				urlVO.setUrl(url);
+				urlVO.setLatestFetchTime(rs.getTimestamp("LATEST_FETCH_TIME").getTime());
+				urlVO.setLastFetchTime(rs.getTimestamp("LAST_FETCH_TIME").getTime());
+				urlVO.setModifiedTime(rs.getTimestamp("MODIFIED_TIME").getTime());
+				urlVO.setFetchInterval(rs.getInt("RETRY_INTERVAL"));
+				urlVO.setRetriesSinceFetch(rs.getByte("RETRIES_SINCE_FETCH"));
+				urlVO.setScore(rs.getFloat("SCORE"));
+				urlVO.setStatus(rs.getByte("STATUS"));
+				urlVO.setSignature(rs.getString("SIGNATURE"));
+				urlVO.setMetadata(rs.getString("METADATA"));
+				urlVO.setSegmentId(rs.getInt("SEGMENT_ID"));
+				result.put(url, urlVO);
+			}
+		} catch (SQLException e) {
+			try{
+				conn.rollback();
+			}catch(SQLException s){
+				LOG.info(
+						"Error while rolling back"
+								+ s.getLocalizedMessage(), s);
+			}
+			LOG.info("Error while deleting rows in URL_DETAIL" + e.getLocalizedMessage(), e);
+		} finally {
+			if (stmt != null) {
+
+				try {
+					try{
+						conn.commit();
+					}catch(SQLException s){
+						LOG.info(
+								"Error while rolling back"
+										+ s.getLocalizedMessage(), s);
+					}
+					stmt.close();
+					conn.close();
+				} catch (SQLException e) {
+					Log.info("Error while closing connection", e);
+				}
+
+			}
+		}
+		return result;
+
 	}
 	
 }

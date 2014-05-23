@@ -500,7 +500,10 @@ public class CrawlDbReader implements Closeable {
 		Writable value = (Writable) valueClass.newInstance();
 		List<UrlVO> urlList = new ArrayList<UrlVO>();
 		DomainDAO domainDAO = new DomainDAO();
+		UrlDAO urlDAO = new UrlDAO();
+		Map<String,UrlVO> urlMap = urlDAO.read();
 		List<DomainVO> domainList = domainDAO.read();
+		UrlVO urlVO = null;
 		for (int i = 0; i < readers.length; i++) {
 			value = (Writable) valueClass.newInstance();
 			Text aKey = (Text) keyClass.newInstance();
@@ -520,10 +523,13 @@ public class CrawlDbReader implements Closeable {
 						break;
 					}
 				}
-				UrlVO urlVO = new UrlVO();
+				if(urlMap.containsKey(urlToSave)){
+					urlVO = urlMap.get(urlToSave);
+				}
 				urlVO.setUrl(urlToSave);
 				urlVO.setStatus(data.getStatus());
-				urlVO.setFetchTime(data.getFetchTime());
+				urlVO.setLastFetchTime(urlVO.getLatestFetchTime());
+				urlVO.setLatestFetchTime(data.getFetchTime());
 				urlVO.setModifiedTime(data.getModifiedTime());
 				urlVO.setRetriesSinceFetch(data.getRetriesSinceFetch());
 				urlVO.setFetchInterval(data.getFetchInterval());
@@ -550,7 +556,8 @@ public class CrawlDbReader implements Closeable {
 
 			}
 		}
-		boolean success = new UrlDAO().update(urlList);
+		
+		boolean success = urlDAO.update(urlList);
 		if(!success){
 			LOG.info("Error occurred while updating db with urls");
 			//throw new Exception();

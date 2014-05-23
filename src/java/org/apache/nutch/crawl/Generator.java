@@ -150,7 +150,8 @@ public class Generator extends Configured implements Tool {
 		private int maxNumSegments = 1;
 		int currentsegmentnum = 1;
 		private Configuration conf;
-		static List<DomainVO> domainList = new ArrayList<DomainVO>();
+		private List<DomainVO> domainList = new ArrayList<DomainVO>();
+		private Map<String,UrlVO> urlMap;
 
 		public void configure(JobConf job) {
 			List<SegmentVO> segmentList = new ArrayList<SegmentVO>();
@@ -188,7 +189,8 @@ public class Generator extends Configured implements Tool {
 			// Read domains from Db
 			if (conf.getBoolean("generate.save.urls.in.segments", false)) {
 				domainList = domainDao.read();
-
+				UrlDAO urlDAO = new UrlDAO();
+				urlMap = urlDAO.read();
 				// Read segments for each domain and update DomainList with
 				// corresponding segmentListVos
 				for (DomainVO domain : domainList) {
@@ -301,6 +303,7 @@ public class Generator extends Configured implements Tool {
 			UrlDAO urlCrud = new UrlDAO();
 			List<UrlVO> urlList = new ArrayList<UrlVO>();
 			List<UrlVO> urlListDef = new ArrayList<UrlVO>();
+
 			while (values.hasNext()) {
 				UrlVO urlVO = new UrlVO();
 				UrlVO urlVODef = new UrlVO();
@@ -401,14 +404,12 @@ public class Generator extends Configured implements Tool {
 							if(urlToSave.length() == 0){
 								urlToSave = "/";
 							}
-							
 							// Iterate through all segments of the domain to
 							// identify the segment which matches the url
 							for (SegmentVO segment : domain.getSegmentVOs()) {
-
 								if (segment.getRule() != null) {
 									if (urlToSave.matches(segment.getRule())) {
-
+										
 										// Add url to output only if segment is
 										// to be crawled
 										if (segment.isCrawl()) {
@@ -419,7 +420,9 @@ public class Generator extends Configured implements Tool {
 										urlVO.setSegmentId(segment
 												.getSegmentId());
 										urlVO.setUrl(urlToSave);
-										urlList.add(urlVO);
+										if(!urlMap.containsKey(urlToSave)){
+											urlList.add(urlVO);
+										}
 									}
 								} else {
 
@@ -433,7 +436,9 @@ public class Generator extends Configured implements Tool {
 									urlVODef.setSegmentId(segment
 											.getSegmentId());
 									urlVODef.setUrl(urlToSave);
-									urlListDef.add(urlVODef);
+									if(!urlMap.containsKey(urlToSave)){
+										urlListDef.add(urlVODef);
+									}
 								}
 
 							}
