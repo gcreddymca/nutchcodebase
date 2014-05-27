@@ -301,9 +301,9 @@ public class Generator extends Configured implements Tool {
 				OutputCollector<FloatWritable, SelectorEntry> output,
 				Reporter reporter) throws IOException {
 			UrlDAO urlCrud = new UrlDAO();
-			List<UrlVO> urlList = new ArrayList<UrlVO>();
-			List<UrlVO> urlListDef = new ArrayList<UrlVO>();
-int count = 0;
+			Set<UrlVO> urlList = new HashSet<UrlVO>();
+			Set<UrlVO> urlListDef = new HashSet<UrlVO>();
+
 			while (values.hasNext()) {
 				UrlVO urlVO = new UrlVO();
 				UrlVO urlVODef = new UrlVO();
@@ -404,6 +404,10 @@ int count = 0;
 							if(urlToSave.length() == 0){
 								urlToSave = "/";
 							}
+							
+							if(urlMap.containsKey(urlToSave) || urlMap.containsKey(urlToSave + "/")){
+								break;
+							}
 							// Iterate through all segments of the domain to
 							// identify the segment which matches the url
 							for (SegmentVO segment : domain.getSegmentVOs()) {
@@ -413,34 +417,31 @@ int count = 0;
 										// Add url to output only if segment is
 										// to be crawled
 										if (segment.isCrawl()) {
-											count++;
-											output.collect(key, entry);
+												output.collect(key, entry);
 										}
 
 										// create urlVO for each url
 										urlVO.setSegmentId(segment
 												.getSegmentId());
 										urlVO.setUrl(urlToSave);
-										if(!urlMap.containsKey(urlToSave)){
-											urlList.add(urlVO);
-										}
+
+										urlList.add(urlVO);
+										urlMap.put(urlToSave, urlVO);
 									}
 								} else {
 
 									// Add url to output only if default segment
 									// is to be crawled
 									if (segment.isCrawl()) {
-										count++;
-										output.collect(key, entry);
+											output.collect(key, entry);
 									}
 
 									// create urlVO for each url
 									urlVODef.setSegmentId(segment
 											.getSegmentId());
 									urlVODef.setUrl(urlToSave);
-									if(!urlMap.containsKey(urlToSave)){
-										urlListDef.add(urlVODef);
-									}
+									urlListDef.add(urlVODef);
+									urlMap.put(urlToSave, urlVO);
 								}
 
 							}
@@ -453,7 +454,6 @@ int count = 0;
 			
 			if (conf.getBoolean("generate.save.urls.in.segments", false)) {
 				// create entry in Url_Detail Table with updated urlList
-				LOG.info("URL List Size >>>>>>>>>"+urlList.size());
 				if(urlList.size() > 0){
 					boolean listCreated = urlCrud.create(urlList);
 					if(!listCreated){
@@ -461,7 +461,6 @@ int count = 0;
 						//throw new IOException();
 					}
 				}
-				LOG.info("URL Default List Size >>>>>>>>>"+urlListDef.size());
 				if(urlListDef.size() > 0){
 					boolean defListCreated = urlCrud.create(urlListDef);
 					if(!defListCreated){
@@ -471,7 +470,6 @@ int count = 0;
 				}
 
 			}
-			LOG.info("Number of urls generated>>>"+count);
 		}
 	}
 

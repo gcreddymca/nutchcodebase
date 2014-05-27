@@ -19,6 +19,7 @@ import org.apache.nutch.crawl.vo.DomainVO;
 import org.apache.nutch.crawl.dao.UrlDAO;
 import org.apache.nutch.fetcher.Fetcher;
 import org.apache.nutch.parse.ParseSegment;
+import org.apache.nutch.segment.SegmentReader;
 import org.apache.nutch.util.NutchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -63,6 +63,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.hadoop.util.Progressable;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.NutchWritable;
+import org.apache.nutch.crawl.dao.SegmentMasterDAO;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.parse.ParseText;
 import org.apache.nutch.protocol.Content;
@@ -597,9 +598,9 @@ public class SegmentReader extends Configured implements
 			mode = MODE_LIST;
 		else if (args[0].equals("-get"))
 			mode = MODE_GET;
-//		else if (args[0].equals("-splitContent")) {
-//			mode = MODE_SPLIT;
-//		}
+		else if (args[0].equals("-splitContent")) {
+			mode = MODE_SPLIT;
+		}
 
 		boolean co = true;
 		boolean fe = true;
@@ -686,21 +687,21 @@ public class SegmentReader extends Configured implements
 					new OutputStreamWriter(System.out, "UTF-8"),
 					new HashMap<String, List<Writable>>());
 			return;
-//		case MODE_SPLIT:
-//			input = args[1];
-//			if (input == null) {
-//				System.err.println("Missing required argument: <segment_dir>");
-//				usage();
-//				return;
-//			}
-//			output = args.length > 2 ? args[2] : null;
-//			if (output == null) {
-//				System.err.println("Missing required argument: <output>");
-//				usage();
-//				return;
-//			}
-//			segmentReader.splitSegmentContent(new Path(input), output);
-//			return;
+		case MODE_SPLIT:
+			input = args[1];
+			if (input == null) {
+				System.err.println("Missing required argument: <segment_dir>");
+				usage();
+				return;
+			}
+			output = args.length > 2 ? args[2] : null;
+			if (output == null) {
+				System.err.println("Missing required argument: <output>");
+				usage();
+				return;
+			}
+			segmentReader.splitSegmentContent(new Path(input), output);
+			return;
 		default:
 			System.err.println("Invalid operation: " + args[0]);
 			usage();
@@ -708,20 +709,20 @@ public class SegmentReader extends Configured implements
 		}
 	}
 
-//	public void splitSegmentContent(Path segment, String output)
-//			throws Exception {
-//		LOG.info("SegmentReader: splitContent '" + segment + "'");
-//		MapFile.Reader[] readers = MapFileOutputFormat.getReaders(fs, new Path(
-//				segment, Content.DIR_NAME), getConf());
-//		ArrayList<Writable> res = new ArrayList<Writable>();
-//		Class<?> keyClass = readers[0].getKeyClass();
-//		Class<?> valueClass = readers[0].getValueClass();
-//		if (!keyClass.getName().equals("org.apache.hadoop.io.Text"))
-//			throw new IOException("Incompatible key (" + keyClass.getName()
-//					+ ")");
-//		Writable value = (Writable) valueClass.newInstance();
-//		SegmentMasterCRUD sg = new SegmentMasterCRUD();
-//		
+	public void splitSegmentContent(Path segment, String output)
+			throws Exception {
+		LOG.info("SegmentReader: splitContent '" + segment + "'");
+		MapFile.Reader[] readers = MapFileOutputFormat.getReaders(fs, new Path(
+				segment, Content.DIR_NAME), getConf());
+		ArrayList<Writable> res = new ArrayList<Writable>();
+		Class<?> keyClass = readers[0].getKeyClass();
+		Class<?> valueClass = readers[0].getValueClass();
+		if (!keyClass.getName().equals("org.apache.hadoop.io.Text"))
+			throw new IOException("Incompatible key (" + keyClass.getName()
+					+ ")");
+		Writable value = (Writable) valueClass.newInstance();
+//		SegmentMasterDAO sg = new SegmentMasterDAO();
+		
 //		List<SegmentVO> segmentList = sg.read(null);
 //		if(segmentList == null || segmentList.size() == 0 ){
 //			LOG.info("No Segments are created");
@@ -731,28 +732,28 @@ public class SegmentReader extends Configured implements
 //			if (bucket.getRule() == null)
 //				defaultSegmentVO = bucket;
 //		}
-//		for (int i = 0; i < readers.length; i++) {
-//			value = (Writable) valueClass.newInstance();
-//			Text aKey = (Text) keyClass.newInstance();
-//			while (readers[i].next(aKey, value)) {
-//				String keyString = aKey.toString();
-//				String defaultFolderHierarchy = RawHTMLFileCreationUtil.getDefaultFolderHierarchy(
-//						keyString, output);
-//				String htmlFileName = RawHTMLFileCreationUtil.getRawHtmlContentFileName(keyString);
-//				RawHTMLFileCreationUtil.createDirectories(defaultFolderHierarchy);
-//				String newFileName = defaultFolderHierarchy + "/"
-//						+ htmlFileName;
-//				LOG.info("SegmentReader: URL '" + keyString + "'");
-//				LOG.info("SegmentReader: Raw html file location '" + newFileName + "'");
-//				RawHTMLFileCreationUtil.createFile(newFileName);
-//				LOG.info("SegmentReader: URL '" + keyString + "'");
-//				LOG.info("SegmentReader: Raw html file location '" + newFileName + "'");
-//				PrintWriter pw = new PrintWriter(newFileName);
-//				pw.write(new String(((Content) value).getContent()));
-//				pw.flush();
-//				pw.close();
-//				LOG.info("SegmentReader: Raw html file content saved'");
-//				// Add urls to bucket if urls match with the bucket rule
+		for (int i = 0; i < readers.length; i++) {
+			value = (Writable) valueClass.newInstance();
+			Text aKey = (Text) keyClass.newInstance();
+			while (readers[i].next(aKey, value)) {
+				String keyString = aKey.toString();
+				String defaultFolderHierarchy = RawHTMLFileCreationUtil.getDefaultFolderHierarchy(
+						keyString, output);
+				String htmlFileName = RawHTMLFileCreationUtil.getRawHtmlContentFileName(keyString);
+				RawHTMLFileCreationUtil.createDirectories(defaultFolderHierarchy);
+				String newFileName = defaultFolderHierarchy + "/"
+						+ htmlFileName;
+				LOG.info("SegmentReader: URL '" + keyString + "'");
+				LOG.info("SegmentReader: Raw html file location '" + newFileName + "'");
+				RawHTMLFileCreationUtil.createFile(newFileName);
+				LOG.info("SegmentReader: URL '" + keyString + "'");
+				LOG.info("SegmentReader: Raw html file location '" + newFileName + "'");
+				PrintWriter pw = new PrintWriter(newFileName);
+				pw.write(new String(((Content) value).getContent()));
+				pw.flush();
+				pw.close();
+				LOG.info("SegmentReader: Raw html file content saved'");
+				// Add urls to bucket if urls match with the bucket rule
 //				boolean bucketFound = false;
 //				for (SegmentVO bucket : segmentList) {
 //					String regex = bucket.getRule();
@@ -785,9 +786,11 @@ public class SegmentReader extends Configured implements
 //			if(bucket.getUrlHtmlLocMap() != null)
 //			sgDetail.update(bucket);
 //		}
-//		readers[0].close();
-//
-//	}
+			}
+		}
+		readers[0].close();
+
+	}
 
 	private static void usage() {
 		System.err

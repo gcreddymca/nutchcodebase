@@ -28,11 +28,13 @@ import org.apache.nutch.crawl.vo.DomainVO;
 import org.apache.nutch.crawl.vo.UrlVO;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -498,7 +500,7 @@ public class CrawlDbReader implements Closeable {
 					+ ")");
 		
 		Writable value = (Writable) valueClass.newInstance();
-		List<UrlVO> urlList = new ArrayList<UrlVO>();
+		Set<UrlVO> urlList = new HashSet<UrlVO>();
 		DomainDAO domainDAO = new DomainDAO();
 		UrlDAO urlDAO = new UrlDAO();
 		Map<String,UrlVO> urlMap = urlDAO.read();

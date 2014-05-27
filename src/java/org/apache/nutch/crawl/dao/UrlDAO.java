@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.mortbay.log.Log;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public class UrlDAO {
 			.getLogger(UrlDAO.class);
 
 	
-	public boolean create(List<UrlVO> urlVOs) {
+	public boolean create(Set<UrlVO> urlVOs) {
 		Connection conn = JDBCConnector.getConnection();
 		boolean result = false;
 		if (conn == null) {
@@ -151,7 +152,7 @@ public class UrlDAO {
 
 	}
 
-	public boolean update(List<UrlVO> urlVOs) {
+	public boolean update(Set<UrlVO> urlVOs) {
 		Connection conn = JDBCConnector.getConnection();
 		boolean result = false;
 		if (conn == null) {
