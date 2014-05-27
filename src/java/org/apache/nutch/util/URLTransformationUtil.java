@@ -7,15 +7,20 @@ import java.util.regex.Pattern;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.util.NutchConfiguration;
 import org.mortbay.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class URLTransformationUtil {
 	private static final Configuration conf;
-	private static final Pattern[] requestParamsExclusionPatterns;
+	private static Pattern[] requestParamsExclusionPatterns =null;
+	public static final Logger LOG = LoggerFactory
+			.getLogger(URLTransformationUtil.class);
 
 	static {
 		conf = NutchConfiguration.create();
 		String[] exclusionList = conf
 				.getStrings("url.request.parameter.exclusion.list");
+		if(exclusionList != null){
 		requestParamsExclusionPatterns = new Pattern[exclusionList.length];
 		StringBuilder pattern = null;
 		for (int i = 0; i < exclusionList.length; i++) {
@@ -26,13 +31,17 @@ public class URLTransformationUtil {
 			requestParamsExclusionPatterns[i] = Pattern.compile(pattern
 					.toString());
 		}
+		
+		}
 	}
 
 	public static String excludeRequestParameters(String url) {
 		String urlPath = url;
 		if (url.contains(NutchConstants.HTML_EXTN))
 			return urlPath;
-
+		if(requestParamsExclusionPatterns == null){
+			return urlPath;
+		}
 		String group = getURLRequestParameters(url);
 		if (group != null) {
 			urlPath = url.replace(group, NutchConstants.EMPTY_STRING);
@@ -52,6 +61,7 @@ public class URLTransformationUtil {
 				urlPath = urlBuilder.toString();
 			}
 		}
+		LOG.info(">>>>>"+urlPath);
 
 		return urlPath;
 	}

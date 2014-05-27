@@ -114,7 +114,7 @@ public class PluginManifestParser {
   public File getPluginFolder(String name) {
     File directory = new File(name);
     if (!directory.isAbsolute()) {
-      URL url = Thread.currentThread().getContextClassLoader().getResource(name);
+      URL url = PluginManifestParser.class.getClassLoader().getResource(name);
       if (url == null && directory.exists() && directory.isDirectory()
           && directory.listFiles().length > 0) {
         return directory; // relative path that is not in the classpath

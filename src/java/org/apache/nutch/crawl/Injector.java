@@ -301,20 +301,7 @@ public class Injector extends Configured implements Tool {
     sortJob.setJobName("inject " + urlDir);
     
    FileInputFormat.addInputPath(sortJob, urlDir);
-  //  DBInputFormat.setInput(sortJob, inputClass, inputQuery, inputCountQuery)
-//    sortJob.setInputFormat(CrestDBInputFormat.class);
-//    sortJob.set("mapred.jdbc.driver.class", "oracle.jdbc.driver.OracleDriver");
-//    sortJob.set("mapred.jdbc.url","jdbc:oracle:thin:@localhost:1521:XE");
-//    sortJob.set("mapred.jdbc.username","CREST");
-//    sortJob.set("mapred.jdbc.password","CREST");
-   // sortJob.setNumMapTasks(1);
-    //sortJob.setNumReduceTasks(1);
-   
-//    sortJob.set("mapred.jdbc.input.field.names","SEED_URL");
-//    sortJob.set("mapred.jdbc.input.query","SELECT SEED_URL FROM DOMAIN");
-//    sortJob.set("mapred.jdbc.input.table.name","DOMAIN");
     sortJob.setMapperClass(InjectMapper.class);
- //   LOG.info("Num Map Task"+sortJob.getNumMapTasks());
     FileOutputFormat.setOutputPath(sortJob, tempDir);
     sortJob.setOutputFormat(SequenceFileOutputFormat.class);
     sortJob.setOutputKeyClass(Text.class);

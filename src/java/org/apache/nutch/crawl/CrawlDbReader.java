@@ -520,40 +520,41 @@ public class CrawlDbReader implements Closeable {
 						if(urlToSave.length() == 0){
 							urlToSave = "/";
 						}
+						if(!urlMap.containsKey(urlToSave)){
+							break;
+						}
+						urlVO = urlMap.get(urlToSave);
+						urlVO.setUrl(urlToSave);
+						urlVO.setStatus(data.getStatus());
+						urlVO.setLastFetchTime(urlVO.getLatestFetchTime());
+						urlVO.setLatestFetchTime(data.getFetchTime());
+						urlVO.setModifiedTime(data.getModifiedTime());
+						urlVO.setRetriesSinceFetch(data.getRetriesSinceFetch());
+						urlVO.setFetchInterval(data.getFetchInterval());
+						urlVO.setScore(data.getScore());
+						if (data.getSignature() != null)
+							urlVO.setSignature(StringUtil.toHexString(data
+									.getSignature()));
+						org.apache.hadoop.io.MapWritable metaData = data.getMetaData();
+						if (metaData != null) {
+							StringBuilder buf = new StringBuilder();
+
+							for (Entry<Writable, Writable> e : metaData.entrySet()) {
+								buf.append("\t");
+								buf.append(e.getKey());
+								buf.append("=");
+								buf.append(e.getValue());
+								buf.append("\n");
+							}
+
+							urlVO.setMetadata(buf.toString());
+						}
+
+						urlList.add(urlVO);
 						break;
 					}
 				}
-				if(urlMap.containsKey(urlToSave)){
-					urlVO = urlMap.get(urlToSave);
-				}
-				urlVO.setUrl(urlToSave);
-				urlVO.setStatus(data.getStatus());
-				urlVO.setLastFetchTime(urlVO.getLatestFetchTime());
-				urlVO.setLatestFetchTime(data.getFetchTime());
-				urlVO.setModifiedTime(data.getModifiedTime());
-				urlVO.setRetriesSinceFetch(data.getRetriesSinceFetch());
-				urlVO.setFetchInterval(data.getFetchInterval());
-				urlVO.setScore(data.getScore());
-				if (data.getSignature() != null)
-					urlVO.setSignature(StringUtil.toHexString(data
-							.getSignature()));
-				org.apache.hadoop.io.MapWritable metaData = data.getMetaData();
-				if (metaData != null) {
-					StringBuilder buf = new StringBuilder();
-
-					for (Entry<Writable, Writable> e : metaData.entrySet()) {
-						buf.append("\t");
-						buf.append(e.getKey());
-						buf.append("=");
-						buf.append(e.getValue());
-						buf.append("\n");
-					}
-
-					urlVO.setMetadata(buf.toString());
-				}
-
-				urlList.add(urlVO);
-
+				
 			}
 		}
 		

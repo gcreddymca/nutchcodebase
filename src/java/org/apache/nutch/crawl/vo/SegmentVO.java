@@ -11,13 +11,9 @@ public class SegmentVO {
 	private int priority;
 	private List<UrlVO> urlVOs;
 	private int domainId;
+	private long crawlInterval;
+	private long nextFetchTime;
 	
-	public int getDomainId() {
-		return domainId;
-	}
-	public void setDomainId(int domainId) {
-		this.domainId = domainId;
-	}
 	public int getSegmentId() {
 		return segmentId;
 	}
@@ -54,6 +50,25 @@ public class SegmentVO {
 	}
 	public void setUrlVOs(List<UrlVO> urlVOs) {
 		this.urlVOs = urlVOs;
+	}
+	
+	public int getDomainId() {
+		return domainId;
+	}
+	public void setDomainId(int domainId) {
+		this.domainId = domainId;
+	}
+	public long getCrawlInterval() {
+		return crawlInterval;
+	}
+	public void setCrawlInterval(long crawlInterval) {
+		this.crawlInterval = crawlInterval;
+	}
+	public long getNextFetchTime() {
+		return nextFetchTime;
+	}
+	public void setNextFetchTime(long nextFetchTime) {
+		this.nextFetchTime = nextFetchTime;
 	}
 	
 }

@@ -303,7 +303,7 @@ public class Generator extends Configured implements Tool {
 			UrlDAO urlCrud = new UrlDAO();
 			List<UrlVO> urlList = new ArrayList<UrlVO>();
 			List<UrlVO> urlListDef = new ArrayList<UrlVO>();
-
+int count = 0;
 			while (values.hasNext()) {
 				UrlVO urlVO = new UrlVO();
 				UrlVO urlVODef = new UrlVO();
@@ -413,6 +413,7 @@ public class Generator extends Configured implements Tool {
 										// Add url to output only if segment is
 										// to be crawled
 										if (segment.isCrawl()) {
+											count++;
 											output.collect(key, entry);
 										}
 
@@ -429,6 +430,7 @@ public class Generator extends Configured implements Tool {
 									// Add url to output only if default segment
 									// is to be crawled
 									if (segment.isCrawl()) {
+										count++;
 										output.collect(key, entry);
 									}
 
@@ -448,9 +450,10 @@ public class Generator extends Configured implements Tool {
 
 				}
 			}
+			
 			if (conf.getBoolean("generate.save.urls.in.segments", false)) {
 				// create entry in Url_Detail Table with updated urlList
-				
+				LOG.info("URL List Size >>>>>>>>>"+urlList.size());
 				if(urlList.size() > 0){
 					boolean listCreated = urlCrud.create(urlList);
 					if(!listCreated){
@@ -458,6 +461,7 @@ public class Generator extends Configured implements Tool {
 						//throw new IOException();
 					}
 				}
+				LOG.info("URL Default List Size >>>>>>>>>"+urlListDef.size());
 				if(urlListDef.size() > 0){
 					boolean defListCreated = urlCrud.create(urlListDef);
 					if(!defListCreated){
@@ -467,6 +471,7 @@ public class Generator extends Configured implements Tool {
 				}
 
 			}
+			LOG.info("Number of urls generated>>>"+count);
 		}
 	}
 

@@ -390,6 +390,9 @@ public class DOMContentUtils {
                 if(conf.getBoolean("url.exclude.request.parameters", false)){
               		newUrl = URLTransformationUtil.excludeRequestParameters(newUrl);
 				}
+				if(newUrl.contains("login.jsp?error=")){
+					System.out.println("FOUND YOU in "+base);
+				}
 				if(conf.getBoolean("url.exclude.bookmarks", false)){
 					newUrl = URLTransformationUtil.excludeBookmarks(newUrl);
       			}

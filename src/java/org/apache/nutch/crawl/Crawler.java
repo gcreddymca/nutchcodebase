@@ -63,6 +63,9 @@ public class Crawler {
 
 		// Fetch domain that needs to be crawled
 		DomainVO domainVO = domainDAO.readByPrimaryKey(domainId);
+		if(domainVO == null){
+			throw new IllegalArgumentException("Domain Id passed is incorrect");
+		}
 		Configuration conf = NutchConfiguration.create();
 		String seedFile = conf.get("seed.urls.file");
 		String regexFileTemplate = conf.get("urlfilter.regex.file.template");
@@ -97,7 +100,6 @@ public class Crawler {
 		regexWriter.flush();
 		regexWriter.close();
 
-		domainVO.setDomainId(domainId);
 		domainVO.setCrawlStatus("STARTED");
 		domainDAO.updateCrawlStatus(domainVO);
 
@@ -111,7 +113,6 @@ public class Crawler {
 
 			success = crawl(numberOfRounds, seedUrl, crawldbPath, segmentPath);
 			if (success) {
-				domainVO.setDomainId(domainId);
 				domainVO.setCrawlStatus("DONE");
 				domainDAO.updateCrawlStatus(domainVO);
 			}
@@ -119,7 +120,6 @@ public class Crawler {
 		} catch (Exception e) {
 			LOG.info("Error occurred while crawling" + e.getLocalizedMessage());
 			e.printStackTrace();
-			domainVO.setDomainId(domainId);
 			domainVO.setCrawlStatus("FAILED");
 			domainDAO.updateCrawlStatus(domainVO);
 			throw new Exception(e.getLocalizedMessage());
@@ -137,9 +137,13 @@ public class Crawler {
 			} catch (IOException i) {
 
 				// Crawl db should not fail unless crawl dir is incorrect
-				LOG.info("Error while reading crawling db"
+				LOG.info("eError while reading crawling db"
 						+ i.getLocalizedMessage());
 			}
+		}
+		if(domainVO.getCrawlStatus().equals("STARTED")){
+			domainVO.setCrawlStatus("FAILED");
+			domainDAO.updateCrawlStatus(domainVO);
 		}
 		return success;
 	}
@@ -279,7 +283,6 @@ public class Crawler {
 		for (DomainVO domainVO : domainVOs) {
 
 			writer.write(domainVO.getUrl() + domainVO.getSeedUrl() + "\n");
-			domainVO.setDomainId(domainVO.getDomainId());
 			domainVO.setCrawlStatus("STARTED");
 			domainDAO.updateCrawlStatus(domainVO);
 			regex.append(domainVO.getUrl());
@@ -323,7 +326,6 @@ public class Crawler {
 			success = crawl(numberOfRounds, seedUrl, crawldbPath, segmentPath);
 			if (success) {
 				for (DomainVO domainVO : domainVOs) {
-					domainVO.setDomainId(domainVO.getDomainId());
 					domainVO.setCrawlStatus("FAILED");
 					domainDAO.updateCrawlStatus(domainVO);
 				}
@@ -333,7 +335,6 @@ public class Crawler {
 			LOG.info("Error occurred while crawling" + e.getLocalizedMessage());
 			e.printStackTrace();
 			for (DomainVO domainVO : domainVOs) {
-				domainVO.setDomainId(domainVO.getDomainId());
 				domainVO.setCrawlStatus("DONE");
 				domainDAO.updateCrawlStatus(domainVO);
 			}
@@ -354,6 +355,13 @@ public class Crawler {
 				// Crawl db should not fail unless crawl dir is incorrect
 				LOG.info("Error while reading crawling db"
 						+ i.getLocalizedMessage());
+			}
+		}
+		for (DomainVO domainVO : domainVOs) {
+
+			if (domainVO.getCrawlStatus().equals("STARTED")) {
+				domainVO.setCrawlStatus("FAILED");
+				domainDAO.updateCrawlStatus(domainVO);
 			}
 		}
 		return success;
