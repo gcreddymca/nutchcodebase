@@ -529,7 +529,7 @@ public class CrawlDbReader implements Closeable {
 						urlVO.setUrl(urlToSave);
 						urlVO.setStatus(data.getStatus());
 						urlVO.setLastFetchTime(urlVO.getLatestFetchTime());
-						urlVO.setLatestFetchTime(data.getFetchTime());
+						urlVO.setLatestFetchTime(System.currentTimeMillis());
 						urlVO.setModifiedTime(data.getModifiedTime());
 						urlVO.setRetriesSinceFetch(data.getRetriesSinceFetch());
 						urlVO.setFetchInterval(data.getFetchInterval());

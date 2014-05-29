@@ -57,7 +57,7 @@ public class Crawler {
 		if (crawlDir == null || crawlDir.length() == 0) {
 			throw new IllegalArgumentException("Missing crawl directory path");
 		}
-
+	
 		deleteDirectory(crawlDir);
 
 		boolean success = false;

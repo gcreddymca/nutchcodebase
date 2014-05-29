@@ -224,6 +224,7 @@ public class Generator extends Configured implements Tool {
 				try {
 					if (filters.filter(url.toString()) == null)
 						return;
+					LOG.info("Here 1");
 				} catch (URLFilterException e) {
 					if (LOG.isWarnEnabled()) {
 						LOG.warn("Couldn't filter url: " + url + " ("
@@ -232,11 +233,12 @@ public class Generator extends Configured implements Tool {
 				}
 			}
 			CrawlDatum crawlDatum = value;
-
+			
 			// check fetch schedule
 			if (!schedule.shouldFetch(url, crawlDatum, curTime)) {
 				LOG.debug("-shouldFetch rejected '" + url + "', fetchTime="
 						+ crawlDatum.getFetchTime() + ", curTime=" + curTime);
+				LOG.info("Here 2");
 				return;
 			}
 			
@@ -246,6 +248,7 @@ public class Generator extends Configured implements Tool {
 			if (oldGenTime != null) { // awaiting fetch & update
 				if (oldGenTime.get() + genDelay > curTime) // still wait for
 					// update
+					LOG.info("Here 3");
 					return;
 			}
 			float sort = 1.0f;
@@ -261,11 +264,13 @@ public class Generator extends Configured implements Tool {
 			if (restrictStatus != null
 					&& !restrictStatus.equalsIgnoreCase(CrawlDatum
 							.getStatusName(crawlDatum.getStatus()))) {
+				LOG.info("Here 4");
 				return;
 			}
 
 			// consider only entries with a score superior to the threshold
 			if (scoreThreshold != Float.NaN && sort < scoreThreshold) {
+				LOG.info("Here 5");
 				return;
 			}
 
@@ -273,6 +278,7 @@ public class Generator extends Configured implements Tool {
 			// threshold
 			if (intervalThreshold != -1
 					&& crawlDatum.getFetchInterval() > intervalThreshold) {
+				LOG.info("Here 6");
 				return;
 			}
 			// sort by decreasing score, using DecreasingFloatComparator
@@ -405,9 +411,6 @@ public class Generator extends Configured implements Tool {
 								urlToSave = "/";
 							}
 							
-							if(urlMap.containsKey(urlToSave) || urlMap.containsKey(urlToSave + "/")){
-								break;
-							}
 							// Iterate through all segments of the domain to
 							// identify the segment which matches the url
 							for (SegmentVO segment : domain.getSegmentVOs()) {
@@ -425,8 +428,13 @@ public class Generator extends Configured implements Tool {
 												.getSegmentId());
 										urlVO.setUrl(urlToSave);
 
-										urlList.add(urlVO);
-										urlMap.put(urlToSave, urlVO);
+										if (!(urlMap.containsKey(urlToSave)
+												|| urlMap
+														.containsKey(urlToSave
+																+ "/"))) {
+											urlList.add(urlVO);
+											urlMap.put(urlToSave, urlVO);
+										}
 									}
 								} else {
 
@@ -440,8 +448,13 @@ public class Generator extends Configured implements Tool {
 									urlVODef.setSegmentId(segment
 											.getSegmentId());
 									urlVODef.setUrl(urlToSave);
-									urlListDef.add(urlVODef);
-									urlMap.put(urlToSave, urlVO);
+									if (!(urlMap.containsKey(urlToSave)
+											|| urlMap
+													.containsKey(urlToSave
+															+ "/"))) {
+										urlListDef.add(urlVODef);
+										urlMap.put(urlToSave, urlVO);
+									}
 								}
 
 							}
