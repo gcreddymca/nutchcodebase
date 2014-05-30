@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+<property>
+<name>http.agent.name</name>
+<value>nviz agent</value>
+</property>
+
+<property>
+<name>http.verbose</name>
+<value>true</value>
+<description>If true, HTTP will log more verbosely.</description>
+</property>
+
+<property>
+<name>fetcher.verbose</name>
+<value>true</value>
+<description>If true, fetcher will log more verbosely.</description>
+</property>
+
+<property>
+<name>plugin.includes</name>
+<value>protocol-http|urlfilter-regex|parse-html</value>
+</property>
+
+<property>
+<name>urlfilter.regex.file</name>
+<value>regex-urlfilter.txt</value>
+</property>
+
+<property>
+<name>urlfilter.regex.file.template</name>
+<value>regex-urlfilter.txt.template</value>
+</property>
+
+<property>
+<name>http.robots.agents</name>
+<value>nviz agent,*</value>
+</property>
+
+<property>
+<name>parser.html.outlinks.ignore_tags</name>
+<value>img,script,link</value>
+</property>
+
+<property>
+  <name>generate.save.urls.in.segments</name>
+  <value>true</value>
+</property>
+
+<property>
+  <name>inject.pick.seed.urls.in.domain</name>
+  <value>true</value>
+</property>
+
+<property>
+  <name>generate.default.segment.name</name>
+  <value>DEFAULT</value>
+</property>
+
+<property>
+  <name>generate.default.segment.crawl</name>
+  <value>true</value>
+</property>
+
+<property>
+  <name>url.exclude.request.parameters</name>
+  <value>true</value>
+</property>
+
+<property>
+  <name>url.request.parameter.exclusion.list</name>
+  <value>jsessionid</value>
+</property>
+
+<property>
+  <name>url.exclude.bookmarks</name>
+  <value>true</value>
+</property>
+
+<property>
+  <name>dbConfig.dataSource</name>
+  <value>jdbc:oracle:thin:@localhost:1521:XE</value>
+</property>
+
+<property>
+  <name>dbConfig.user</name>
+  <value>CREST</value>
+</property>
+
+<property>
+  <name>dbConfig.password</name>
+  <value>CREST</value>
+</property>
+
+<property>
+  <name>inject.read.seed.urls.from.db</name>
+  <value>CREST</value>
+</property>
+
+<property>
+  <name>seed.urls.file</name>
+  <value>urls.txt</value>
+</property>
+
+<property>
+  <name>file.content.limit</name>
+  <value>-1</value>
+</property>
+
+<property>
+<name>db.max.outlinks.per.page</name>
+<value>-1</value>
+</property>
+
+<property>
+  <name>http.content.limit</name>
+  <value>-1</value>
+</property>
+
+</configuration>
