@@ -91,7 +91,7 @@ public class DomainDAO {
 					domainVO.setDomainName(rs.getString("DOMAIN_NAME"));
 					domainVO.setUrl(rs.getString("URL"));
 					domainVO.setSeedUrl(rs.getString("SEED_URL"));
-					domainVO.setDirectory(rs.getString("DIRECTORY"));
+					domainVO.setFinal_content_directory(rs.getString("FINAL_CONTENT_DIRECTORY"));
 					domainVO.setCrawlStatus(rs.getString("CRAWL_STATUS"));
 					result.add(domainVO);
 				}
@@ -138,7 +138,7 @@ public class DomainDAO {
 				domainVO.setDomainName(rs.getString("DOMAIN_NAME"));
 				domainVO.setUrl(rs.getString("URL"));			
 				domainVO.setSeedUrl(rs.getString("SEED_URL"));
-				domainVO.setDirectory(rs.getString("DIRECTORY"));
+				domainVO.setFinal_content_directory(rs.getString("FINAL_CONTENT_DIRECTORY"));
 				domainVO.setCrawlStatus(rs.getString("CRAWL_STATUS"));
 			}
 		} catch (SQLException e) {
