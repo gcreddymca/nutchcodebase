@@ -6,7 +6,8 @@ public class SegmentVO {
 	
 	private int segmentId;
 	private String segmentName;
-	private String rule;
+	private String url_pattern_rule;
+	
 	private boolean crawl;
 	private int priority;
 	private List<UrlVO> urlVOs;
@@ -14,6 +15,13 @@ public class SegmentVO {
 	private long crawlInterval;
 	private long nextFetchTime;
 	
+	
+	public String getUrl_pattern_rule() {
+		return url_pattern_rule;
+	}
+	public void setUrl_pattern_rule(String url_pattern_rule) {
+		this.url_pattern_rule = url_pattern_rule;
+	}
 	public int getSegmentId() {
 		return segmentId;
 	}
@@ -26,12 +34,7 @@ public class SegmentVO {
 	public void setSegmentName(String segmentName) {
 		this.segmentName = segmentName;
 	}
-	public String getRule() {
-		return rule;
-	}
-	public void setRule(String rule) {
-		this.rule = rule;
-	}
+	
 	public boolean isCrawl() {
 		return crawl;
 	}

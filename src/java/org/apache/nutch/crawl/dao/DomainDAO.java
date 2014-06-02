@@ -39,7 +39,7 @@ public class DomainDAO {
 					SegmentVO sg = new SegmentVO();
 					sg.setSegmentId(rs.getInt("SEGMENT_ID"));
 					sg.setSegmentName(rs.getString("SEGMENT_NAME"));
-					sg.setRule(rs.getString("RULE"));
+					sg.setUrl_pattern_rule(rs.getString("URL_PATTERN_RULE"));
 					if (rs.getInt("CRAWL") == 0) {
 						sg.setCrawl(false);
 					} else {

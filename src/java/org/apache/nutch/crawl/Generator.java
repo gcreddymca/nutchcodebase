@@ -414,8 +414,8 @@ public class Generator extends Configured implements Tool {
 							// Iterate through all segments of the domain to
 							// identify the segment which matches the url
 							for (SegmentVO segment : domain.getSegmentVOs()) {
-								if (segment.getRule() != null) {
-									if (urlToSave.matches(segment.getRule())) {
+								if (segment.getUrl_pattern_rule() != null) {
+									if (urlToSave.matches(segment.getUrl_pattern_rule())) {
 										
 										// Add url to output only if segment is
 										// to be crawled
