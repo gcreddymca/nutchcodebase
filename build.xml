@@ -113,10 +113,6 @@
   <!--                                                                    -->
   <!-- ================================================================== -->
   <target name="jar" depends="compile-core" description="--> make nutch.jar">
-    <copy file="${conf.dir}/nutch-default.xml"
-          todir="${build.classes}"/>
-    <copy file="${conf.dir}/nutch-site.xml"
-          todir="${build.classes}"/>
     <jar jarfile="${build.dir}/${final.name}.jar"
          basedir="${build.classes}">
       <manifest>
@@ -130,10 +126,6 @@
   <!--                                                                    -->
   <!-- ================================================================== -->  
   <target name="release" depends="compile-core" description="--> generate the release distribution">
-    <copy file="${conf.dir}/nutch-default.xml"
-          todir="${build.classes}"/>
-    <copy file="${conf.dir}/nutch-site.xml"
-          todir="${build.classes}"/>
           
 	<!-- build the main artifact -->
 	<jar jarfile="${maven-jar}" basedir="${build.classes}" />
@@ -283,8 +275,6 @@
            command command has run, exclude them.  The conf directory has 
            them.
       -->
-      <zipfileset dir="${build.classes}"
-                  excludes="nutch-default.xml,nutch-site.xml"/>
       <zipfileset dir="${conf.dir}" excludes="*.template,hadoop*.*"/>
       <zipfileset dir="${build.lib.dir}" prefix="lib"
                   includes="**/*.jar" excludes="hadoop-*.jar"/>
