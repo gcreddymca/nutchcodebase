@@ -404,13 +404,20 @@ public class Generator extends Configured implements Tool {
 						// if match found
 						
 						if (urlToSave.startsWith(domain.getUrl())) {
+							
+							String seedUrlInDomain = domain.getUrl();
+							System.out.println("seedUrlInDomain:"+seedUrlInDomain);
+							if(domain.getUrl().lastIndexOf("/") != -1 && domain.getSeedUrl().length()==1) {
+								if(domain.getUrl().substring(domain.getUrl().lastIndexOf("/")+1).length() > 0) 
+									seedUrlInDomain =  domain.getUrl().substring(domain.getUrl().lastIndexOf("/"));
+								
+							}
 							// rip out domain Name from Url
-							urlToSave = urlToSave.replaceAll(domain.getUrl(),
-									"");
+							urlToSave = urlToSave.replaceAll(domain.getUrl(),"");
 							if(urlToSave.length() == 0){
 								urlToSave = "/";
 							}
-							
+							System.out.println("urlToSave:"+urlToSave);
 							// Iterate through all segments of the domain to
 							// identify the segment which matches the url
 							for (SegmentVO segment : domain.getSegmentVOs()) {
@@ -426,15 +433,17 @@ public class Generator extends Configured implements Tool {
 										// create urlVO for each url
 										urlVO.setSegmentId(segment
 												.getSegmentId());
-										urlVO.setUrl(urlToSave);
+										
+										urlVO.setUrl(seedUrlInDomain+urlToSave);
 
-										if (!(urlMap.containsKey(urlToSave)
+										if (!(urlMap.containsKey(seedUrlInDomain+urlToSave)
 												|| urlMap
-														.containsKey(urlToSave
+														.containsKey(seedUrlInDomain+urlToSave
 																+ "/"))) {
 											urlList.add(urlVO);
-											urlMap.put(urlToSave, urlVO);
+											urlMap.put(seedUrlInDomain+urlToSave, urlVO);
 										}
+										//urlList.add(urlVO);
 									}
 								} else {
 
@@ -447,14 +456,15 @@ public class Generator extends Configured implements Tool {
 									// create urlVO for each url
 									urlVODef.setSegmentId(segment
 											.getSegmentId());
-									urlVODef.setUrl(urlToSave);
-									if (!(urlMap.containsKey(urlToSave)
+									urlVODef.setUrl(seedUrlInDomain+urlToSave);
+									if (!(urlMap.containsKey(seedUrlInDomain+urlToSave)
 											|| urlMap
-													.containsKey(urlToSave
+													.containsKey(seedUrlInDomain+urlToSave
 															+ "/"))) {
 										urlListDef.add(urlVODef);
-										urlMap.put(urlToSave, urlVO);
+										urlMap.put(seedUrlInDomain+urlToSave, urlVO);
 									}
+									//urlListDef.add(urlVODef);
 								}
 
 							}

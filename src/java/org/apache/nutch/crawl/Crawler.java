@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
@@ -15,6 +16,7 @@ import org.apache.nutch.crawl.CrawlDbReader;
 import org.apache.nutch.crawl.Generator;
 import org.apache.nutch.crawl.Injector;
 import org.apache.nutch.crawl.dao.DomainDAO;
+import org.apache.nutch.crawl.dao.SegmentMasterDAO;
 import org.apache.nutch.crawl.vo.DomainVO;
 import org.apache.nutch.crawl.dao.UrlDAO;
 import org.apache.nutch.fetcher.Fetcher;
@@ -48,6 +50,8 @@ public class Crawler {
 			int domainId) throws Exception {
 
 		DomainDAO domainDAO = new DomainDAO();
+		SegmentMasterDAO segmentDAO = new SegmentMasterDAO();
+		  List<String> segmentUrlRules = new ArrayList<String>();
 		// Check if crawl is in progress
 		long count = domainDAO.checkCrawlInProgress();
 		// Throw exception if crawl is already in progress
@@ -67,24 +71,22 @@ public class Crawler {
 		if(domainVO == null){
 			throw new IllegalArgumentException("Domain Id passed is incorrect");
 		}
+		segmentUrlRules = segmentDAO.readNotCrawlSegmentUrlRule(domainId);
 		Configuration conf = NutchConfiguration.create();
 		String seedFile = conf.get("seed.urls.file");
 		String regexFileTemplate = conf.get("urlfilter.regex.file.template");
 		String regexFile = conf.get("urlfilter.regex.file");
 
 		// Create seed url file for domain being crawled
-		URL seedUrl = Thread.currentThread().getContextClassLoader()
-				.getResource(seedFile);
+		URL seedUrl = Thread.currentThread().getContextClassLoader().getResource(seedFile);
 		FileWriter writer = new FileWriter(seedUrl.getPath());
 		writer.write(domainVO.getUrl() + domainVO.getSeedUrl());
 		writer.flush();
 		writer.close();
 
 		// Read regex-urlfilter.txt.template
-		URL regexUrlTemplate = Thread.currentThread().getContextClassLoader()
-				.getResource(regexFileTemplate);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				regexUrlTemplate.openStream()));
+		URL regexUrlTemplate = Thread.currentThread().getContextClassLoader().getResource(regexFileTemplate);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(regexUrlTemplate.openStream()));
 		String currentLine = null;
 		StringBuilder regexString = new StringBuilder();
 
@@ -93,7 +95,17 @@ public class Crawler {
 			regexString.append(currentLine + "\n");
 		}
 		reader.close();
-		regexString.append("+^" + domainVO.getUrl());
+		if(segmentUrlRules!=null && segmentUrlRules.size()>0){
+			for(String urlRule : segmentUrlRules){
+				regexString.append("-^" + domainVO.getUrl()+urlRule+"\n");
+			}
+		}
+		
+		if(domainVO.getSeedUrl().trim().length() > 1)
+			regexString.append("+^" + domainVO.getUrl()+domainVO.getSeedUrl());
+		else
+			regexString.append("+^" + domainVO.getUrl());
+		
 		URL regexUrl = Thread.currentThread().getContextClassLoader()
 				.getResource(regexFile);
 		FileWriter regexWriter = new FileWriter(regexUrl.getPath());
@@ -180,8 +192,7 @@ public class Crawler {
 	 * @throws Exception
 	 */
 
-	private boolean crawl(int numberOfRounds, URL seedUrl, String crawldbPath,
-			String segmentPath) throws Exception {
+	private boolean crawl(int numberOfRounds, URL seedUrl, String crawldbPath,String segmentPath) throws Exception {
 		String[] args;
 		File[] listOfSegments = null;
 		File segmentPathFile = new File(segmentPath);
@@ -354,8 +365,7 @@ public class Crawler {
 			} catch (IOException i) {
 
 				// Crawl db should not fail unless crawl dir is incorrect
-				LOG.info("Error while reading crawling db"
-						+ i.getLocalizedMessage());
+				LOG.info("Error while reading crawling db"+ i.getLocalizedMessage());
 			}
 		}
 		for (DomainVO domainVO : domainVOs) {

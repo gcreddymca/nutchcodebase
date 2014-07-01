@@ -680,7 +680,7 @@
 
 <property>
  <name>fetcher.max.crawl.delay</name>
- <value>30</value>
+ <value>10</value>
  <description>
  If the Crawl-Delay in robots.txt is set to greater than this value (in
  seconds) then the fetcher will skip this page, generating an error report.
@@ -692,7 +692,7 @@
 
 <property>
   <name>fetcher.threads.fetch</name>
-  <value>10</value>
+  <value>20</value>
   <description>The number of FetcherThreads the fetcher should use.
   This is also determines the maximum number of requests that are
   made at once (each FetcherThread handles one connection). The total
@@ -1148,7 +1148,7 @@
 
 <property>
   <name>urlfilter.regex.file</name>
-  <value>/WEB-INF/conf/regex-urlfilter.txt</value>
+  <value>regex-urlfilter.txt</value>
   <description>Name of file on CLASSPATH containing regular expressions
   used by urlfilter-regex (RegexURLFilter) plugin.</description>
 </property>

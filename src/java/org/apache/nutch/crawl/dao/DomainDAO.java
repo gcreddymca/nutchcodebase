@@ -169,7 +169,7 @@ public class DomainDAO {
 		}
 		PreparedStatement stmt = null;
 		try {
-
+			conn.setAutoCommit(false);
 			String query = "UPDATE DOMAIN SET CRAWL_STATUS = ? WHERE DOMAIN_ID=?";
 			stmt = conn.prepareStatement(query);
 			stmt.setString(1, domainVO.getCrawlStatus());

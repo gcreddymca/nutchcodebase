@@ -121,4 +121,8 @@
   <value>-1</value>
 </property>
 
+<property>
+    <name>plugin.folders</name>
+    <value>E:/NVIZ/jboss-eap-6.1/standalone/deployments/nutch.war/WEB-INF/plugins</value>
+</property>
 </configuration>

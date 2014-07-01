@@ -24,9 +24,14 @@ public class UrlDAO {
 	public static final Logger LOG = LoggerFactory
 			.getLogger(UrlDAO.class);
 
-	
+	static int CONNECTIONCOUNT = 0;
 	public boolean create(Set<UrlVO> urlVOs) {
 		Connection conn = JDBCConnector.getConnection();
+		
+		CONNECTIONCOUNT++;
+		int connectioncount=CONNECTIONCOUNT;
+		System.out.println("**********creating  Connection***********"+connectioncount);
+		int crawlId = getCrawlId();
 		boolean result = false;
 		if (conn == null) {
 			LOG.info("Connection not found. Could not create row in URL_DETAIL");
@@ -37,7 +42,7 @@ public class UrlDAO {
 		int count = 0;
 		try {
 			LOG.info("Connected to UrlCRUD DB");
-			String query = "INSERT INTO URL_DETAIL (URL,STATUS,LAST_FETCH_TIME,LATEST_FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+			String query = "INSERT INTO URL_DETAIL (URL,STATUS,LAST_FETCH_TIME,LATEST_FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID,CRAWL_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 			stmt = conn.prepareStatement(query);
 
 			for (UrlVO url : urlVOs) {
@@ -52,10 +57,13 @@ public class UrlDAO {
 				stmt.setString(9, url.getSignature());
 				stmt.setString(10, url.getMetadata());
 				stmt.setInt(11, url.getSegmentId());
+				stmt.setInt(12,crawlId);
 				stmt.addBatch();
+				//LOG.info("********url is *******************"+url.getUrl()+"*****************"+getCrawlId());
 				count++;
 				if (count == urlVOs.size() || count == maxStatements) {
 					stmt.executeBatch();
+					LOG.info("In Create Method");
 					LOG.info("Batch job executed on URL_DETAIL");
 					count=0;
 				}
@@ -85,6 +93,7 @@ public class UrlDAO {
 					}
 					stmt.close();
 					conn.close();
+					System.out.println("**********Closing Connection***********"+connectioncount);
 				} catch (SQLException e) {
 					Log.info("Error while closing connection", e);
 				}
@@ -97,6 +106,7 @@ public class UrlDAO {
 
 	public boolean createUrlDetail(UrlVO url) {
 		Connection conn = JDBCConnector.getConnection();
+		int crawlId = getCrawlId();
 		boolean result = false;
 		if (conn == null) {
 			LOG.info("Connection not found. Could not create row in URL_DETAIL");
@@ -104,7 +114,7 @@ public class UrlDAO {
 		}
 		PreparedStatement stmt = null;
 		try {
-			String query = "INSERT INTO URL_DETAIL (URL,STATUS,LAST_FETCH_TIME,LATEST_FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+			String query = "INSERT INTO URL_DETAIL (URL,STATUS,LAST_FETCH_TIME,LATEST_FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID,CRAWL_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 			stmt = conn.prepareStatement(query);
 
 			stmt.setString(1, url.getUrl());
@@ -118,6 +128,7 @@ public class UrlDAO {
 			stmt.setString(9, url.getSignature());
 			stmt.setString(10, url.getMetadata());
 			stmt.setInt(11, url.getSegmentId());
+			stmt.setInt(12, crawlId);
 			stmt.execute();
 			result = true;
 		} catch (SQLException e) {
@@ -182,6 +193,7 @@ public class UrlDAO {
 				count++;
 				if (count == urlVOs.size() || count == maxStatements) {
 					stmt.executeBatch();
+					LOG.info("In Update Method");
 					LOG.info("Batch job executed on URL_DETAIL");
 					count=0;
 				}
@@ -275,7 +287,7 @@ public class UrlDAO {
 		Statement stmt = null;
 		UrlVO urlVO = null;
 		try {
-			String query = "SELECT * FROM URL_DETAIL";
+			String query = "SELECT * FROM URL_DETAIL WHERE CRAWL_ID = "+getCrawlId();
 			stmt = conn.createStatement();
 			stmt.execute(query);
 			ResultSet rs = stmt.getResultSet();
@@ -327,4 +339,37 @@ public class UrlDAO {
 
 	}
 	
+	public int getCrawlId(){
+		Connection conn = JDBCConnector.getConnection();
+		//System.out.println("getting crawlid");
+		int crawl_id = 0;
+		if(conn != null){
+			Statement stmt = null;
+			try {
+				stmt = conn.createStatement();
+				
+				String query = "SELECT CRAWL_ID FROM CRAWL_MASTER WHERE PROGRESS=1";
+				stmt.execute(query);
+				ResultSet rs = stmt.getResultSet();
+				if(rs.next())
+				crawl_id = rs.getInt("CRAWL_ID");
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}finally {
+				if (stmt != null) {
+					try {
+						stmt.close();
+						conn.close();
+					} catch (SQLException e) {
+						LOG.info("Error while closing connection" + e);
+					}
+
+				}
+
+			}
+		}
+		return crawl_id;
+		
+	}
 }

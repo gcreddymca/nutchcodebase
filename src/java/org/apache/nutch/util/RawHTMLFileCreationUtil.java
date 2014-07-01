@@ -1,22 +1,30 @@
 package org.apache.nutch.util;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 public class RawHTMLFileCreationUtil {
 
 	public static String getDefaultFolderHierarchy(String url,
-			String outputFolder) {
-
+			String outputFolder) throws SQLException {
+		
 		url = url.replaceAll("\\\\", "//");
 		url = url.replaceAll(NutchConstants.COLON, NutchConstants.EMPTY_STRING);
 		String[] strArr = url.split(NutchConstants.FORWARD_SLASH);
 		StringBuilder outputFolderHierarchy = new StringBuilder(outputFolder);
 		int arrLength = strArr.length;
 		for (int j = 0; j < arrLength; j++) {
-			String element = strArr[j];
+			String element = strArr[j].trim();
 			if (element.length() == 0
 					|| patternMatchesInput(NutchConstants.PROTOCOLS, element)) {
 				continue;
@@ -36,6 +44,8 @@ public class RawHTMLFileCreationUtil {
 		return outputFolderHierarchy.toString();
 
 	}
+	
+	
 
 	public static boolean patternMatchesInput(Pattern pattern, String element) {
 		Matcher matcher = pattern.matcher(element);
@@ -55,7 +65,7 @@ public class RawHTMLFileCreationUtil {
 			newFile.createNewFile();
 		}
 	}
-
+	
 	public static String getRawHtmlContentFileName(String url) {
 		String fileName = "index.html";
 		if (!patternMatchesInput(NutchConstants.URL_FILE_TYPES_PATTERN, url)) {

@@ -24,9 +24,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Writer;
-//import org.apache.nutch.crawl.SegmentDetailCRUD;
-//import org.apache.nutch.crawl.SegmentMasterCRUD;
-//import org.apache.nutch.crawl.SegmentVO;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +32,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -64,6 +60,7 @@ import org.apache.hadoop.util.Progressable;
 import org.apache.nutch.crawl.CrawlDatum;
 import org.apache.nutch.crawl.NutchWritable;
 import org.apache.nutch.crawl.dao.SegmentMasterDAO;
+import org.apache.nutch.crawl.vo.DomainVO;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.parse.ParseText;
 import org.apache.nutch.protocol.Content;
@@ -71,8 +68,13 @@ import org.apache.nutch.util.HadoopFSUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 import org.apache.nutch.util.RawHTMLFileCreationUtil;
+import org.apache.nutch.util.URLTransformationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+//import org.apache.nutch.crawl.SegmentDetailCRUD;
+//import org.apache.nutch.crawl.SegmentMasterCRUD;
+//import org.apache.nutch.crawl.SegmentVO;
+
 
 /** Dump the content of a segment. */
 public class SegmentReader extends Configured implements
@@ -591,6 +593,9 @@ public class SegmentReader extends Configured implements
 			usage();
 			return;
 		}
+		int crawlId = Integer.parseInt(args[3]);
+		int domainId = Integer.parseInt(args[4]);
+		String finalpath = args[5];
 		int mode = -1;
 		if (args[0].equals("-dump"))
 			mode = MODE_DUMP;
@@ -630,6 +635,7 @@ public class SegmentReader extends Configured implements
 				args[i] = null;
 			}
 		}
+		
 		Configuration conf = NutchConfiguration.create();
 		final FileSystem fs = FileSystem.get(conf);
 		SegmentReader segmentReader = new SegmentReader(conf, co, fe, ge, pa,
@@ -667,8 +673,7 @@ public class SegmentReader extends Configured implements
 				} else
 					dirs.add(new Path(args[i]));
 			}
-			segmentReader.list(dirs,
-					new OutputStreamWriter(System.out, "UTF-8"));
+			segmentReader.list(dirs, new OutputStreamWriter(System.out, "UTF-8"));
 			return;
 		case MODE_GET:
 			input = args[1];
@@ -700,7 +705,7 @@ public class SegmentReader extends Configured implements
 				usage();
 				return;
 			}
-			segmentReader.splitSegmentContent(new Path(input), output);
+			segmentReader.splitSegmentContent(new Path(input), output,crawlId,domainId,finalpath);
 			return;
 		default:
 			System.err.println("Invalid operation: " + args[0]);
@@ -709,9 +714,15 @@ public class SegmentReader extends Configured implements
 		}
 	}
 
-	public void splitSegmentContent(Path segment, String output)
+	public void splitSegmentContent(Path segment, String output,int crawlId,int domainId,String finalpath)
 			throws Exception {
 		LOG.info("SegmentReader: splitContent '" + segment + "'");
+		
+		
+		SegmentMasterDAO smDAO = new SegmentMasterDAO();
+		//CrawlUtil crawlUtil = new CrawlUtil();
+		DomainVO domainVO = smDAO.readByPrimaryKey(domainId);
+		URLTransformationUtil transformation = new URLTransformationUtil();
 		MapFile.Reader[] readers = MapFileOutputFormat.getReaders(fs, new Path(
 				segment, Content.DIR_NAME), getConf());
 		ArrayList<Writable> res = new ArrayList<Writable>();
@@ -736,13 +747,17 @@ public class SegmentReader extends Configured implements
 			value = (Writable) valueClass.newInstance();
 			Text aKey = (Text) keyClass.newInstance();
 			while (readers[i].next(aKey, value)) {
+				
 				String keyString = aKey.toString();
+				
+				String[] split = keyString.split(domainVO.getUrl().lastIndexOf("/") != -1 ? domainVO.getUrl().substring(0, domainVO.getUrl().lastIndexOf("/")) : domainVO.getUrl());
+				String string = split[1];
+				
 				String defaultFolderHierarchy = RawHTMLFileCreationUtil.getDefaultFolderHierarchy(
 						keyString, output);
 				String htmlFileName = RawHTMLFileCreationUtil.getRawHtmlContentFileName(keyString);
 				RawHTMLFileCreationUtil.createDirectories(defaultFolderHierarchy);
-				String newFileName = defaultFolderHierarchy + "/"
-						+ htmlFileName;
+				String newFileName = defaultFolderHierarchy + "/" + htmlFileName;
 				LOG.info("SegmentReader: URL '" + keyString + "'");
 				LOG.info("SegmentReader: Raw html file location '" + newFileName + "'");
 				RawHTMLFileCreationUtil.createFile(newFileName);
@@ -752,6 +767,8 @@ public class SegmentReader extends Configured implements
 				pw.write(new String(((Content) value).getContent()));
 				pw.flush();
 				pw.close();
+				transformation.urlTransformation(string,newFileName,crawlId,domainId,finalpath);
+				
 				LOG.info("SegmentReader: Raw html file content saved'");
 				// Add urls to bucket if urls match with the bucket rule
 //				boolean bucketFound = false;
@@ -791,6 +808,9 @@ public class SegmentReader extends Configured implements
 		readers[0].close();
 
 	}
+	
+
+
 
 	private static void usage() {
 		System.err
