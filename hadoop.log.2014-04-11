@@ -1,3 +1,0 @@
-2014-04-11 12:46:27,841 INFO  crawl.CrawlDbReader - CrawlDb dump: starting
-2014-04-11 12:46:27,856 INFO  crawl.CrawlDbReader - CrawlDb db: E:/NOVA10.1.2/TestCrawl/crawldb
-2014-04-11 12:46:28,271 WARN  mapred.JobClient - Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.

@@ -123,6 +123,6 @@
 
 <property>
     <name>plugin.folders</name>
-    <value>E:/NVIZ/jboss-eap-6.1/standalone/deployments/nutch.war/WEB-INF/plugins</value>
+    <value>G:/NVIZ/jboss-eap-6.1/standalone/deployments/hm.war/WEB-INF/plugins</value>
 </property>
 </configuration>

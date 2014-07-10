@@ -18,7 +18,8 @@ import org.slf4j.LoggerFactory;
 
 public class SegmentMasterDAO {
 
-	public static final Logger LOG = LoggerFactory.getLogger(SegmentMasterDAO.class);
+	public static final Logger LOG = LoggerFactory
+			.getLogger(SegmentMasterDAO.class);
 
 	public boolean create(SegmentVO segment) {
 		Connection conn = JDBCConnector.getConnection();
@@ -44,16 +45,23 @@ public class SegmentMasterDAO {
 			try{
 				conn.rollback();
 			}catch(SQLException s){
-				LOG.info("Error while rolling back"	+ s.getLocalizedMessage(), e);
+				LOG.info(
+						"Error while rolling back"
+								+ s.getLocalizedMessage(), e);
 			}
-			LOG.info("Error while creating row in SEGMENT_MASTER"+ e.getLocalizedMessage(), e);
+			LOG.info(
+					"Error while creating row in SEGMENT_MASTER"
+							+ e.getLocalizedMessage(), e);
 		} finally {
 			if (stmt != null) {
+
 				try {
 					try{
 						conn.commit();
 					}catch(SQLException s){
-						LOG.info("Error while rolling back"	+ s.getLocalizedMessage(), s);
+						LOG.info(
+								"Error while rolling back"
+										+ s.getLocalizedMessage(), s);
 					}
 					stmt.close();
 					conn.close();
@@ -97,7 +105,8 @@ public class SegmentMasterDAO {
 			}
 		} catch (SQLException e) {
 			LOG.info(
-					"Error while fetching row in SEGMENT_MASTER"+ e.getLocalizedMessage(), e);
+					"Error while fetching row in SEGMENT_MASTER"
+							+ e.getLocalizedMessage(), e);
 		} finally {
 			if (stmt != null) {
 				try {
@@ -215,8 +224,11 @@ public class SegmentMasterDAO {
 				domain.setDomainName(resultSet.getString("DOMAIN_NAME"));
 				domain.setSeedUrl(resultSet.getString("SEED_URL"));
 				domain.setUrl(resultSet.getString("URL"));
-				domain.setRaw_content_directory(resultSet.getString("raw_content_directory"));
-				domain.setFinal_content_directory(resultSet.getString("final_content_directory"));
+				domain.setRaw_content_directory(resultSet
+						.getString("raw_content_directory"));
+				domain.setFinal_content_directory(resultSet
+						.getString("final_content_directory"));
+
 			} catch (Exception e) {
 				LOG.info("Error while fetching row in DOMAIN_MASTER" + e);
 				throw new Exception("Could Not read Domain from Doamin_Master");

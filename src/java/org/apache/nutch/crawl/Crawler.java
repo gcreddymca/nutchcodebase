@@ -8,7 +8,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.crawl.CrawlDb;
@@ -25,6 +29,7 @@ import org.apache.nutch.segment.SegmentReader;
 import org.apache.nutch.util.NutchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class Crawler {
 
@@ -77,16 +82,33 @@ public class Crawler {
 		String regexFileTemplate = conf.get("urlfilter.regex.file.template");
 		String regexFile = conf.get("urlfilter.regex.file");
 
+		
+		
+		StringBuilder allowedUrls = new StringBuilder();
 		// Create seed url file for domain being crawled
-		URL seedUrl = Thread.currentThread().getContextClassLoader().getResource(seedFile);
+		URL seedUrl = Thread.currentThread().getContextClassLoader()
+				.getResource(seedFile);
 		FileWriter writer = new FileWriter(seedUrl.getPath());
-		writer.write(domainVO.getUrl() + domainVO.getSeedUrl());
+		StringTokenizer seedUrls = new StringTokenizer(domainVO.getSeedUrl(), " ");
+		String seedUrlsToken = null;
+		while(seedUrls.hasMoreTokens()) {
+			seedUrlsToken = seedUrls.nextToken();
+			writer.write(domainVO.getUrl() + seedUrlsToken );
+			writer.write(System.getProperty( "line.separator" ));
+			if(domainVO.getSeedUrl().trim().length() > 1)
+				allowedUrls.append("+^" + domainVO.getUrl() + seedUrlsToken + "\n");
+			else
+				allowedUrls.append("+^" + domainVO.getUrl());
+		}
+		
 		writer.flush();
 		writer.close();
 
 		// Read regex-urlfilter.txt.template
-		URL regexUrlTemplate = Thread.currentThread().getContextClassLoader().getResource(regexFileTemplate);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(regexUrlTemplate.openStream()));
+		URL regexUrlTemplate = Thread.currentThread().getContextClassLoader()
+				.getResource(regexFileTemplate);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				regexUrlTemplate.openStream()));
 		String currentLine = null;
 		StringBuilder regexString = new StringBuilder();
 
@@ -101,10 +123,7 @@ public class Crawler {
 			}
 		}
 		
-		if(domainVO.getSeedUrl().trim().length() > 1)
-			regexString.append("+^" + domainVO.getUrl()+domainVO.getSeedUrl());
-		else
-			regexString.append("+^" + domainVO.getUrl());
+		regexString.append(allowedUrls);
 		
 		URL regexUrl = Thread.currentThread().getContextClassLoader()
 				.getResource(regexFile);
@@ -192,7 +211,8 @@ public class Crawler {
 	 * @throws Exception
 	 */
 
-	private boolean crawl(int numberOfRounds, URL seedUrl, String crawldbPath,String segmentPath) throws Exception {
+	private boolean crawl(int numberOfRounds, URL seedUrl, String crawldbPath,
+			String segmentPath) throws Exception {
 		String[] args;
 		File[] listOfSegments = null;
 		File segmentPathFile = new File(segmentPath);
@@ -226,7 +246,18 @@ public class Crawler {
 
 			segmentPathFile = new File(segmentPath);
 			if (segmentPathFile.isDirectory()) {
-				listOfSegments = segmentPathFile.listFiles();
+				List<File> sortedListOfSegs = Arrays.asList(segmentPathFile.listFiles());
+				Collections.sort(sortedListOfSegs, new Comparator<File>() {
+			        @Override
+			        public int compare(File o1, File o2) {
+			            String p1 = o1.getAbsolutePath();
+			            String p2 = o2.getAbsolutePath();
+			            return p1.compareTo(p2);
+			        }
+			    });
+				listOfSegments = new File[sortedListOfSegs.size()];
+				listOfSegments = sortedListOfSegs.toArray(listOfSegments);
+				
 			}
 
 			// Run Fetcher, ParseSegment and Update db only if generate has
@@ -365,7 +396,8 @@ public class Crawler {
 			} catch (IOException i) {
 
 				// Crawl db should not fail unless crawl dir is incorrect
-				LOG.info("Error while reading crawling db"+ i.getLocalizedMessage());
+				LOG.info("Error while reading crawling db"
+						+ i.getLocalizedMessage());
 			}
 		}
 		for (DomainVO domainVO : domainVOs) {

@@ -456,8 +456,7 @@ public class SegmentReader extends Configured implements
 	}
 
 	private List<Writable> getSeqRecords(Path dir, Text key) throws Exception {
-		SequenceFile.Reader[] readers = SequenceFileOutputFormat.getReaders(
-				getConf(), dir);
+		SequenceFile.Reader[] readers = SequenceFileOutputFormat.getReaders(getConf(), dir);
 		ArrayList<Writable> res = new ArrayList<Writable>();
 		Class<?> keyClass = readers[0].getKeyClass();
 		Class<?> valueClass = readers[0].getValueClass();
@@ -717,44 +716,29 @@ public class SegmentReader extends Configured implements
 	public void splitSegmentContent(Path segment, String output,int crawlId,int domainId,String finalpath)
 			throws Exception {
 		LOG.info("SegmentReader: splitContent '" + segment + "'");
-		
-		
 		SegmentMasterDAO smDAO = new SegmentMasterDAO();
-		//CrawlUtil crawlUtil = new CrawlUtil();
 		DomainVO domainVO = smDAO.readByPrimaryKey(domainId);
 		URLTransformationUtil transformation = new URLTransformationUtil();
-		MapFile.Reader[] readers = MapFileOutputFormat.getReaders(fs, new Path(
-				segment, Content.DIR_NAME), getConf());
-		ArrayList<Writable> res = new ArrayList<Writable>();
+		MapFile.Reader[] readers = MapFileOutputFormat.getReaders(fs, new Path(segment, Content.DIR_NAME), getConf());
 		Class<?> keyClass = readers[0].getKeyClass();
 		Class<?> valueClass = readers[0].getValueClass();
-		if (!keyClass.getName().equals("org.apache.hadoop.io.Text"))
-			throw new IOException("Incompatible key (" + keyClass.getName()
-					+ ")");
+		if (!keyClass.getName().equals("org.apache.hadoop.io.Text")){
+			throw new IOException("Incompatible key (" + keyClass.getName()	+ ")");
+		}	
 		Writable value = (Writable) valueClass.newInstance();
 //		SegmentMasterDAO sg = new SegmentMasterDAO();
 		
-//		List<SegmentVO> segmentList = sg.read(null);
-//		if(segmentList == null || segmentList.size() == 0 ){
-//			LOG.info("No Segments are created");
-//		}
-//		SegmentVO defaultSegmentVO = null;
-//		for (SegmentVO bucket : segmentList) {
-//			if (bucket.getRule() == null)
-//				defaultSegmentVO = bucket;
-//		}
+	//	ArrayList<Thread> transThreadList = new ArrayList<Thread>();
 		for (int i = 0; i < readers.length; i++) {
 			value = (Writable) valueClass.newInstance();
 			Text aKey = (Text) keyClass.newInstance();
 			while (readers[i].next(aKey, value)) {
-				
 				String keyString = aKey.toString();
 				
-				String[] split = keyString.split(domainVO.getUrl().lastIndexOf("/") != -1 ? domainVO.getUrl().substring(0, domainVO.getUrl().lastIndexOf("/")) : domainVO.getUrl());
-				String string = split[1];
+				String[] split = keyString.split(domainVO.getUrl());
+				String urlLink = split[1];
 				
-				String defaultFolderHierarchy = RawHTMLFileCreationUtil.getDefaultFolderHierarchy(
-						keyString, output);
+				String defaultFolderHierarchy = RawHTMLFileCreationUtil.getDefaultFolderHierarchy(keyString, output);
 				String htmlFileName = RawHTMLFileCreationUtil.getRawHtmlContentFileName(keyString);
 				RawHTMLFileCreationUtil.createDirectories(defaultFolderHierarchy);
 				String newFileName = defaultFolderHierarchy + "/" + htmlFileName;
@@ -764,57 +748,36 @@ public class SegmentReader extends Configured implements
 				LOG.info("SegmentReader: URL '" + keyString + "'");
 				LOG.info("SegmentReader: Raw html file location '" + newFileName + "'");
 				PrintWriter pw = new PrintWriter(newFileName);
-				pw.write(new String(((Content) value).getContent()));
+				String rawContent = new String(((Content) value).getContent());
+				rawContent = rawContent.replaceAll("\r\n", "");
+				rawContent = rawContent.replaceAll("\0", "");
+				pw.write(rawContent);
 				pw.flush();
 				pw.close();
-				transformation.urlTransformation(string,newFileName,crawlId,domainId,finalpath);
+				transformation.urlTransformation(urlLink,newFileName,crawlId,domainId,finalpath);
 				
 				LOG.info("SegmentReader: Raw html file content saved'");
-				// Add urls to bucket if urls match with the bucket rule
-//				boolean bucketFound = false;
-//				for (SegmentVO bucket : segmentList) {
-//					String regex = bucket.getRule();
-//
-//					if (regex != null && Pattern.matches(regex, keyString)) {
-//					
-//						if (bucket.getUrlHtmlLocMap() == null) {
-//							bucket.setUrlHtmlLocMap(new HashMap<String, String>());
-//						}
-//						bucket.getUrlHtmlLocMap().put(keyString, newFileName);
-//						bucketFound = true;
-//						break;
-//					}
-//				}
-//
-//				if (!bucketFound && defaultSegmentVO != null) {		
-//					if(defaultSegmentVO.getUrlHtmlLocMap() == null){
-//						defaultSegmentVO.setUrlHtmlLocMap(new HashMap<String,String>());
-//					}
-//					defaultSegmentVO.getUrlHtmlLocMap().put(keyString, newFileName);
-//
-//				}
-//			}
-//
-//		}
-//		SegmentDetailCRUD sgDetail = new SegmentDetailCRUD();
-//		
-//		// Update bucket with url list
-//		for(SegmentVO bucket : segmentList){
-//			if(bucket.getUrlHtmlLocMap() != null)
-//			sgDetail.update(bucket);
-//		}
+				
+				//Multi Threading 
+				/*TransformationRunner tfr = new TransformationRunner(urlLink,rawContent,crawlId,domainId,finalpath);
+				Thread transThread = new Thread(tfr);
+				transThreadList.add(transThread);
+				LOG.info("New Thread created with id:"+transThread.getId()+"Count:"+transThreadList.size());
+				transThread.start();*/
+				
 			}
 		}
 		readers[0].close();
-
+		/*LOG.info("Total transThread Count is:"+transThreadList.size());
+		for(Thread thread : transThreadList){
+			thread.join();
+			LOG.info("Joining Thread No:"+transThreadList.size());
+		}
+		LOG.info("All Threads has finished:");*/
 	}
-	
-
-
 
 	private static void usage() {
-		System.err
-				.println("Usage: SegmentReader (-dump ... | -list ... | -get ... | -splitContent ) [general options]\n");
+		System.err.println("Usage: SegmentReader (-dump ... | -list ... | -get ... | -splitContent ) [general options]\n");
 		System.err.println("* General options:");
 		System.err.println("\t-nocontent\tignore content directory");
 		System.err.println("\t-nofetch\tignore crawl_fetch directory");
@@ -823,40 +786,26 @@ public class SegmentReader extends Configured implements
 		System.err.println("\t-noparsedata\tignore parse_data directory");
 		System.err.println("\t-noparsetext\tignore parse_text directory");
 		System.err.println();
-		System.err
-				.println("* SegmentReader -dump <segment_dir> <output> [general options]");
-		System.err
-				.println("  Dumps content of a <segment_dir> as a text file to <output>.\n");
+		System.err.println("* SegmentReader -dump <segment_dir> <output> [general options]");
+		System.err.println("  Dumps content of a <segment_dir> as a text file to <output>.\n");
 		System.err.println("\t<segment_dir>\tname of the segment directory.");
-		System.err
-				.println("\t<output>\tname of the (non-existent) output directory.");
+		System.err.println("\t<output>\tname of the (non-existent) output directory.");
 		System.err.println();
-		System.err
-				.println("* SegmentReader -list (<segment_dir1> ... | -dir <segments>) [general options]");
-		System.err
-				.println("  List a synopsis of segments in specified directories, or all segments in");
-		System.err
-				.println("  a directory <segments>, and print it on System.out\n");
-		System.err
-				.println("\t<segment_dir1> ...\tlist of segment directories to process");
-		System.err
-				.println("\t-dir <segments>\t\tdirectory that contains multiple segments");
+		System.err.println("* SegmentReader -list (<segment_dir1> ... | -dir <segments>) [general options]");
+		System.err.println("  List a synopsis of segments in specified directories, or all segments in");
+		System.err.println("  a directory <segments>, and print it on System.out\n");
+		System.err.println("\t<segment_dir1> ...\tlist of segment directories to process");
+		System.err.println("\t-dir <segments>\t\tdirectory that contains multiple segments");
 		System.err.println();
-		System.err
-				.println("* SegmentReader -get <segment_dir> <keyValue> [general options]");
-		System.err
-				.println("  Get a specified record from a segment, and print it on System.out.\n");
+		System.err.println("* SegmentReader -get <segment_dir> <keyValue> [general options]");
+		System.err.println("  Get a specified record from a segment, and print it on System.out.\n");
 		System.err.println("\t<segment_dir>\tname of the segment directory.");
 		System.err.println("\t<keyValue>\tvalue of the key (url).");
-		System.err
-				.println("\t\tNote: put double-quotes around strings with spaces.");
+		System.err.println("\t\tNote: put double-quotes around strings with spaces.");
 		System.err.println("* SegmentReader -splitContent <segment_dir> <output>");
-		System.err
-				.println("  Get a all records from content directory of segment, and extract content value for each record and save to file with extn .htm");
+		System.err.println("  Get a all records from content directory of segment, and extract content value for each record and save to file with extn .htm");
 		System.err.println("\t<segment_dir>\tname of the segment directory.");
-		System.err
-				.println("\t<output>\tname of the (non-existent) output directory.");
-		System.err
-				.println("\t\tNote: put double-quotes around strings with spaces.");
+		System.err.println("\t<output>\tname of the (non-existent) output directory.");
+		System.err.println("\t\tNote: put double-quotes around strings with spaces.");
 	}
 }

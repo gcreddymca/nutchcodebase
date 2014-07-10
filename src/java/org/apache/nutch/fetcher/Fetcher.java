@@ -710,7 +710,7 @@ public class Fetcher extends Configured implements Tool,
               redirecting = false;
               Protocol protocol = this.protocolFactory.getProtocol(fit.url.toString());
               BaseRobotRules rules = protocol.getRobotRules(fit.url, fit.datum);
-              if (!rules.isAllowed(fit.u.toString())) {
+              /*if (!rules.isAllowed(fit.u.toString())) {
                 // unblock
                 fetchQueues.finishFetchItem(fit, true);
                 if (LOG.isDebugEnabled()) {
@@ -719,7 +719,7 @@ public class Fetcher extends Configured implements Tool,
                 output(fit.url, fit.datum, null, ProtocolStatus.STATUS_ROBOTS_DENIED, CrawlDatum.STATUS_FETCH_GONE);
                 reporter.incrCounter("FetcherStatus", "robots_denied", 1);
                 continue;
-              }
+              }*/
               if (rules.getCrawlDelay() > 0) {
                 if (rules.getCrawlDelay() > maxCrawlDelay && maxCrawlDelay >= 0) {
                   // unblock

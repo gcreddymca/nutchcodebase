@@ -198,8 +198,11 @@ public class Generator extends Configured implements Tool {
 					segmentList = domainDao.readSegmentsFromDomain(domain
 							.getDomainId());
 					SegmentVO defaultSeg = segmentList.get(0);
-					segmentList.remove(0);
-					segmentList.add(defaultSeg);
+					//commented as part of default segment priority changed to 9999
+					/*if(defaultSeg.getSegmentName().equalsIgnoreCase("default")) {
+						segmentList.remove(0);
+						segmentList.add(defaultSeg);
+					}*/
 
 					domain.setSegmentVOs(segmentList);
 
@@ -405,13 +408,19 @@ public class Generator extends Configured implements Tool {
 						
 						if (urlToSave.startsWith(domain.getUrl())) {
 							
-							String seedUrlInDomain = domain.getUrl();
-							System.out.println("seedUrlInDomain:"+seedUrlInDomain);
-							if(domain.getUrl().lastIndexOf("/") != -1 && domain.getSeedUrl().length()==1) {
+							/*String seedUrlInDomain = domain.getUrl();
+							if(domain.getUrl().lastIndexOf("/") != -1) {
 								if(domain.getUrl().substring(domain.getUrl().lastIndexOf("/")+1).length() > 0) 
 									seedUrlInDomain =  domain.getUrl().substring(domain.getUrl().lastIndexOf("/"));
 								
+							}*/
+							StringTokenizer sTokens = new StringTokenizer(domain.getSeedUrl(), " ");
+							List seedUrls = new ArrayList<String>();
+							while(sTokens.hasMoreTokens()){
+								seedUrls.add(sTokens.nextToken());
 							}
+							
+							String domainUrl = extractDomainIfIncludesSeedUrl(domain.getUrl());
 							// rip out domain Name from Url
 							urlToSave = urlToSave.replaceAll(domain.getUrl(),"");
 							if(urlToSave.length() == 0){
@@ -422,7 +431,8 @@ public class Generator extends Configured implements Tool {
 							// identify the segment which matches the url
 							for (SegmentVO segment : domain.getSegmentVOs()) {
 								if (segment.getUrl_pattern_rule() != null) {
-									if (urlToSave.matches(segment.getUrl_pattern_rule())) {
+									//if (urlToSave.matches(segment.getUrl_pattern_rule())) {
+									if(checkUrlMatchesSegmentPatternRule(urlToSave, segment.getUrl_pattern_rule(), seedUrls)) {
 										
 										// Add url to output only if segment is
 										// to be crawled
@@ -430,18 +440,17 @@ public class Generator extends Configured implements Tool {
 												output.collect(key, entry);
 										}
 
-										// create urlVO for each url
-										urlVO.setSegmentId(segment
-												.getSegmentId());
-										
-										urlVO.setUrl(seedUrlInDomain+urlToSave);
-
-										if (!(urlMap.containsKey(seedUrlInDomain+urlToSave)
+										if (!(urlMap.containsKey(urlToSave)
 												|| urlMap
-														.containsKey(seedUrlInDomain+urlToSave
+														.containsKey(urlToSave
 																+ "/"))) {
+											// create urlVO for each url
+											urlVO.setSegmentId(segment
+													.getSegmentId());
+											
+											urlVO.setUrl(urlToSave);
 											urlList.add(urlVO);
-											urlMap.put(seedUrlInDomain+urlToSave, urlVO);
+											urlMap.put(urlToSave, urlVO);
 										}
 										//urlList.add(urlVO);
 									}
@@ -456,13 +465,13 @@ public class Generator extends Configured implements Tool {
 									// create urlVO for each url
 									urlVODef.setSegmentId(segment
 											.getSegmentId());
-									urlVODef.setUrl(seedUrlInDomain+urlToSave);
-									if (!(urlMap.containsKey(seedUrlInDomain+urlToSave)
+									urlVODef.setUrl(urlToSave);
+									if (!(urlMap.containsKey(urlToSave)
 											|| urlMap
-													.containsKey(seedUrlInDomain+urlToSave
+													.containsKey(urlToSave
 															+ "/"))) {
 										urlListDef.add(urlVODef);
-										urlMap.put(seedUrlInDomain+urlToSave, urlVO);
+										urlMap.put(urlToSave, urlVO);
 									}
 									//urlListDef.add(urlVODef);
 								}
@@ -493,6 +502,48 @@ public class Generator extends Configured implements Tool {
 				}
 
 			}
+		}
+		
+		private boolean checkUrlMatchesSegmentPatternRule(String url, String patternRule, List seedUrls) {
+			Iterator<String> itr = seedUrls.iterator();
+			String seedUrl = null;
+			boolean matchFound = false;
+			while(itr.hasNext()) {
+				seedUrl = itr.next();
+				if(patternRule.length() == 1) {
+					matchFound = (url.matches(seedUrl));
+					if(matchFound)
+						break;
+				}
+				else if(url.matches(seedUrl + patternRule)) {
+					matchFound = true;
+					if(matchFound)
+						break;
+				}
+			}
+			return matchFound;
+		}
+		
+		/*
+		 * To extract only the domain url if seed url was also given in domain url
+		 */
+		private String extractDomainIfIncludesSeedUrl(String domainUrl) {
+			boolean hasHttp = false;
+			
+			if (domainUrl.contains("http://")) {
+				hasHttp = true;
+				domainUrl = domainUrl.substring(domainUrl.indexOf("//") + 2,
+						domainUrl.length());
+			} 
+			
+			if(domainUrl.lastIndexOf("/") != -1) {
+				if(domainUrl.substring(domainUrl.lastIndexOf("/")+1).length() > 0) 
+					domainUrl =  domainUrl.substring(0, domainUrl.lastIndexOf("/"));
+				
+			}
+			if(hasHttp)
+				domainUrl = "http://"+domainUrl;
+			return domainUrl;
 		}
 	}
 

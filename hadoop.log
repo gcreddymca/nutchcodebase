@@ -1,8 +1,0 @@
-2014-04-14 13:19:18,283 INFO  crawl.CrawlDbReader - CrawlDb dump: starting
-2014-04-14 13:19:18,285 INFO  crawl.CrawlDbReader - CrawlDb db: E:/NOVA10.1.2/TestCrawl/crawldb
-2014-04-14 13:19:19,525 WARN  mapred.JobClient - Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
-2014-04-14 14:55:19,466 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-2014-04-14 14:59:50,762 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-2014-04-14 15:02:04,900 WARN  util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-2014-04-14 15:02:06,313 INFO  mortbay.log - Logging to org.slf4j.impl.Log4jLoggerAdapter(org.mortbay.log) via org.mortbay.log.Slf4jLog
-2014-04-14 15:02:06,313 INFO  mortbay.log - Error while creating row in SEGMENT_MASTER
