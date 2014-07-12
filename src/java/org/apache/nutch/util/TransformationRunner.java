@@ -271,36 +271,41 @@ public class TransformationRunner implements Runnable{
 				// remove bookmarks
 				hrefValue = excludeBookmarks(hrefValue);
 
-				// iterate through Map in urlHtmlLoc segment
-				for (Map.Entry<String, String> entry : urlHtmlLoc.entrySet()) {
-					// if hrefVal matches with url in the map then replace
-					// htmlContent
-					// with the corresponding HtmlLocation
-					if (hrefValue.length() > 0 && hrefValue.equals(entry.getValue())) {
+				//Checking href contains extension jsp or not
+				if(!hrefValue.contains(".jsp")){
+					// iterate through Map in urlHtmlLoc segment
+					for (Map.Entry<String, String> entry : urlHtmlLoc.entrySet()) {
+						// if hrefVal matches with url in the map then replace
+						// htmlContent
+						// with the corresponding HtmlLocation
+						if (hrefValue.length() > 0 && hrefValue.equals(entry.getValue())) {
 
-						if (urlType.equals("AbsoluteWithHttp")) {
+							if (urlType.equals("AbsoluteWithHttp")) {
 
-							hrefValue = "http://".concat(domain).concat(
-									entry.getKey());
+								hrefValue = "http://".concat(domain).concat(
+										entry.getKey());
 
-						} else if (urlType.equals("AbsoluteWithoutHttp")) {
-							hrefValue = domain.concat(entry.getKey());
-						} else if (urlType.equals("AbsoluteWithSlash")) {
-							hrefValue = "//".concat(domain).concat(
-									entry.getKey());
-						} else if (urlType.equals("RelativeWithoutSlash")) {
-							hrefValue = entry.getKey().substring(1,
-									entry.getKey().length());
-						} else {
-							hrefValue = entry.getKey();
+							} else if (urlType.equals("AbsoluteWithoutHttp")) {
+								hrefValue = domain.concat(entry.getKey());
+							} else if (urlType.equals("AbsoluteWithSlash")) {
+								hrefValue = "//".concat(domain).concat(
+										entry.getKey());
+							} else if (urlType.equals("RelativeWithoutSlash")) {
+								hrefValue = entry.getKey().substring(1,
+										entry.getKey().length());
+							} else {
+								hrefValue = entry.getKey();
+							}
+						    hrefValue = hrefValue.split("\\/index.html")[0];
+							htmlContent = htmlContent.replaceAll("[\"]"+tempValue+"[\"]", "\""+hrefValue+"\"");
 						}
-					    hrefValue = hrefValue.split("\\/index.html")[0];
-						htmlContent = htmlContent.replaceAll("[\"]"+tempValue+"[\"]", "\""+hrefValue+"\"");
 					}
-
+					
+				} else{
+					//No remap link for jsp url
+					htmlContent = htmlContent.replaceAll("[\"]"+tempValue+"[\"]", "\""+hrefValue+"\"");
 				}
 			}
-
 		}
 		return htmlContent;
 	}
