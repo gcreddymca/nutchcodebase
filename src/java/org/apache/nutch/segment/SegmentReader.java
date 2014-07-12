@@ -68,6 +68,7 @@ import org.apache.nutch.util.HadoopFSUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 import org.apache.nutch.util.RawHTMLFileCreationUtil;
+import org.apache.nutch.util.TransformationRunner;
 import org.apache.nutch.util.URLTransformationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -728,7 +729,7 @@ public class SegmentReader extends Configured implements
 		Writable value = (Writable) valueClass.newInstance();
 //		SegmentMasterDAO sg = new SegmentMasterDAO();
 		
-	//	ArrayList<Thread> transThreadList = new ArrayList<Thread>();
+		ArrayList<Thread> transThreadList = new ArrayList<Thread>();
 		for (int i = 0; i < readers.length; i++) {
 			value = (Writable) valueClass.newInstance();
 			Text aKey = (Text) keyClass.newInstance();
@@ -745,8 +746,8 @@ public class SegmentReader extends Configured implements
 				LOG.info("SegmentReader: URL '" + keyString + "'");
 				LOG.info("SegmentReader: Raw html file location '" + newFileName + "'");
 				RawHTMLFileCreationUtil.createFile(newFileName);
-				LOG.info("SegmentReader: URL '" + keyString + "'");
-				LOG.info("SegmentReader: Raw html file location '" + newFileName + "'");
+				//LOG.info("SegmentReader: URL '" + keyString + "'");
+				//LOG.info("SegmentReader: Raw html file location '" + newFileName + "'");
 				PrintWriter pw = new PrintWriter(newFileName);
 				String rawContent = new String(((Content) value).getContent());
 				rawContent = rawContent.replaceAll("\r\n", "");
@@ -754,26 +755,25 @@ public class SegmentReader extends Configured implements
 				pw.write(rawContent);
 				pw.flush();
 				pw.close();
-				transformation.urlTransformation(urlLink,newFileName,crawlId,domainId,finalpath);
+				//transformation.urlTransformation(urlLink,newFileName,crawlId,domainId,finalpath);
 				
 				LOG.info("SegmentReader: Raw html file content saved'");
 				
 				//Multi Threading 
-				/*TransformationRunner tfr = new TransformationRunner(urlLink,rawContent,crawlId,domainId,finalpath);
+				TransformationRunner tfr = new TransformationRunner(urlLink,rawContent,crawlId,domainId,finalpath);
 				Thread transThread = new Thread(tfr);
 				transThreadList.add(transThread);
-				LOG.info("New Thread created with id:"+transThread.getId()+"Count:"+transThreadList.size());
-				transThread.start();*/
-				
+				//LOG.info("New Thread created with id:"+transThread.getId()+"Count:"+transThreadList.size());
+				transThread.start();
 			}
 		}
 		readers[0].close();
-		/*LOG.info("Total transThread Count is:"+transThreadList.size());
+		//LOG.info("Total transThread Count is:"+transThreadList.size());
 		for(Thread thread : transThreadList){
 			thread.join();
-			LOG.info("Joining Thread No:"+transThreadList.size());
+			//LOG.info("Joining Thread No:"+transThreadList.size());
 		}
-		LOG.info("All Threads has finished:");*/
+		LOG.info("All Threads has finished:");
 	}
 
 	private static void usage() {
