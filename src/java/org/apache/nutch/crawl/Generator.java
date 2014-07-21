@@ -426,7 +426,7 @@ public class Generator extends Configured implements Tool {
 							if(urlToSave.length() == 0){
 								urlToSave = "/";
 							}
-							System.out.println("urlToSave:"+urlToSave);
+							
 							// Iterate through all segments of the domain to
 							// identify the segment which matches the url
 							for (SegmentVO segment : domain.getSegmentVOs()) {
@@ -515,7 +515,7 @@ public class Generator extends Configured implements Tool {
 					if(matchFound)
 						break;
 				}
-				else if(url.matches(seedUrl + patternRule)) {
+				else if(url.matches(patternRule)) {
 					matchFound = true;
 					if(matchFound)
 						break;

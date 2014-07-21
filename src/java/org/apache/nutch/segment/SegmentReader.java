@@ -18,6 +18,7 @@ package org.apache.nutch.segment;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -32,6 +33,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -72,10 +75,6 @@ import org.apache.nutch.util.TransformationRunner;
 import org.apache.nutch.util.URLTransformationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import org.apache.nutch.crawl.SegmentDetailCRUD;
-//import org.apache.nutch.crawl.SegmentMasterCRUD;
-//import org.apache.nutch.crawl.SegmentVO;
-
 
 /** Dump the content of a segment. */
 public class SegmentReader extends Configured implements
@@ -714,12 +713,15 @@ public class SegmentReader extends Configured implements
 		}
 	}
 
-	public void splitSegmentContent(Path segment, String output,int crawlId,int domainId,String finalpath)
+	public void splitSegmentContent(Path segment, String output,int crawlId,int domainId,String finalpath) throws Exception {
+		splitSegmentContent(segment, output, crawlId, domainId, finalpath, null);
+	}
+	
+	public void splitSegmentContent(Path segment, String output,int crawlId,int domainId,String finalpath, Map<String, List<String>> transformationMap)
 			throws Exception {
 		LOG.info("SegmentReader: splitContent '" + segment + "'");
 		SegmentMasterDAO smDAO = new SegmentMasterDAO();
-		DomainVO domainVO = smDAO.readByPrimaryKey(domainId);
-		URLTransformationUtil transformation = new URLTransformationUtil();
+		DomainVO domainVO = smDAO.readByPrimaryKey(domainId, null);
 		MapFile.Reader[] readers = MapFileOutputFormat.getReaders(fs, new Path(segment, Content.DIR_NAME), getConf());
 		Class<?> keyClass = readers[0].getKeyClass();
 		Class<?> valueClass = readers[0].getValueClass();
@@ -727,7 +729,9 @@ public class SegmentReader extends Configured implements
 			throw new IOException("Incompatible key (" + keyClass.getName()	+ ")");
 		}	
 		Writable value = (Writable) valueClass.newInstance();
-//		SegmentMasterDAO sg = new SegmentMasterDAO();
+		
+		Map<String, String> urlLocMapToReplace = new HashMap<String, String>();
+		urlLocMapToReplace = smDAO.readUrlHtmlLocforAllSegment(crawlId, null);
 		
 		ArrayList<Thread> transThreadList = new ArrayList<Thread>();
 		for (int i = 0; i < readers.length; i++) {
@@ -735,19 +739,13 @@ public class SegmentReader extends Configured implements
 			Text aKey = (Text) keyClass.newInstance();
 			while (readers[i].next(aKey, value)) {
 				String keyString = aKey.toString();
-				
 				String[] split = keyString.split(domainVO.getUrl());
 				String urlLink = split[1];
-				
 				String defaultFolderHierarchy = RawHTMLFileCreationUtil.getDefaultFolderHierarchy(keyString, output);
 				String htmlFileName = RawHTMLFileCreationUtil.getRawHtmlContentFileName(keyString);
 				RawHTMLFileCreationUtil.createDirectories(defaultFolderHierarchy);
 				String newFileName = defaultFolderHierarchy + "/" + htmlFileName;
-				LOG.info("SegmentReader: URL '" + keyString + "'");
-				LOG.info("SegmentReader: Raw html file location '" + newFileName + "'");
 				RawHTMLFileCreationUtil.createFile(newFileName);
-				//LOG.info("SegmentReader: URL '" + keyString + "'");
-				//LOG.info("SegmentReader: Raw html file location '" + newFileName + "'");
 				PrintWriter pw = new PrintWriter(newFileName);
 				String rawContent = new String(((Content) value).getContent());
 				rawContent = rawContent.replaceAll("\r\n", "");
@@ -755,20 +753,14 @@ public class SegmentReader extends Configured implements
 				pw.write(rawContent);
 				pw.flush();
 				pw.close();
-				//transformation.urlTransformation(urlLink,newFileName,crawlId,domainId,finalpath);
-				
-				LOG.info("SegmentReader: Raw html file content saved'");
-				
-				//Multi Threading 
-				TransformationRunner tfr = new TransformationRunner(urlLink,rawContent,crawlId,domainId,finalpath);
-				Thread transThread = new Thread(tfr);
+				//Thread creation process
+				TransformationRunner htmlThread = new TransformationRunner(urlLink,rawContent,crawlId,domainId,finalpath, urlLocMapToReplace, transformationMap, domainVO.getUrl());
+				Thread transThread = new Thread(htmlThread);
 				transThreadList.add(transThread);
-				//LOG.info("New Thread created with id:"+transThread.getId()+"Count:"+transThreadList.size());
 				transThread.start();
 			}
 		}
 		readers[0].close();
-		//LOG.info("Total transThread Count is:"+transThreadList.size());
 		for(Thread thread : transThreadList){
 			thread.join();
 			//LOG.info("Joining Thread No:"+transThreadList.size());

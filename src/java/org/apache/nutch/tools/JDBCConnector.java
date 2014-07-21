@@ -3,14 +3,9 @@ package org.apache.nutch.tools;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
 import java.util.Properties;
 
 import javax.naming.InitialContext;
@@ -18,7 +13,6 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
 import org.apache.nutch.util.NutchConfiguration;
 import org.mortbay.log.Log;
 
@@ -33,33 +27,26 @@ public class JDBCConnector {
 	}
 
 	public static Connection getRegularConnection() {
-
 		Connection conn = null;
 		Properties connectionProps = new Properties();
 		connectionProps.put("user", conf.get("dbConfig.user"));
 		connectionProps.put("password", conf.get("dbConfig.password"));
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			conn = DriverManager.getConnection(conf.get("dbConfig.dataSource"),
-					connectionProps);
+			conn = DriverManager.getConnection(conf.get("dbConfig.dataSource"),	connectionProps);
 			conn.setAutoCommit(false);
-
 		} catch (SQLException e) {
-			Log.info(
-					"Error while creating DB Connection"
-							+ e.getLocalizedMessage(), e);
+			Log.warn("Error while creating DB Connection"+ e.getLocalizedMessage());
 		} catch (ClassNotFoundException e) {
-			Log.info(
-					"Error while creating DB connection"
-							+ e.getLocalizedMessage(), e);
+			Log.warn("Error while creating DB connection"+ e.getLocalizedMessage(), e);
+		} catch(Exception e){
+			Log.warn(e.getLocalizedMessage());
 		}
-
-		System.out.println("Connected to database" + conn);
+		Log.info("Connected to database" + conn);
 		return conn;
 	}
 	
 	public static Connection getConnection() {
-
 		try {
 			prop.load(new FileInputStream(System.getProperty("DBProperties")));
 			ctx = new InitialContext();

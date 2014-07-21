@@ -175,6 +175,7 @@ public class DomainDAO {
 			stmt.setString(1, domainVO.getCrawlStatus());
 			stmt.setInt(2, domainVO.getDomainId());
 			success = stmt.execute();
+			conn.commit();
 		} catch (SQLException e) {
 			LOG.info("Error while updating row in DOMAIN" + e);
 			e.printStackTrace();
@@ -187,7 +188,6 @@ public class DomainDAO {
 			if (stmt != null) {
 
 				try {
-					conn.commit();
 					stmt.close();
 					conn.close();
 				} catch (SQLException e) {

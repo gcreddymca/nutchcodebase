@@ -41,6 +41,7 @@ public class SegmentMasterDAO {
 			}
 			stmt.setInt(4, segment.getPriority());
 			result = stmt.execute();
+			conn.commit();
 		} catch (SQLException e) {
 			try{
 				conn.rollback();
@@ -56,13 +57,6 @@ public class SegmentMasterDAO {
 			if (stmt != null) {
 
 				try {
-					try{
-						conn.commit();
-					}catch(SQLException s){
-						LOG.info(
-								"Error while rolling back"
-										+ s.getLocalizedMessage(), s);
-					}
 					stmt.close();
 					conn.close();
 				} catch (SQLException e) {
@@ -203,9 +197,13 @@ public class SegmentMasterDAO {
 	  return result;
 	 }
 	 
-	 public DomainVO readByPrimaryKey(int primaryKey) throws Exception {
-			JDBCConnector jdbcCon = new JDBCConnector();
-			Connection conn = jdbcCon.getConnection();
+	 public DomainVO readByPrimaryKey(int primaryKey, Connection conn) throws Exception {
+			boolean connCreated = false;
+		 	if(conn == null) {
+				JDBCConnector jdbcCon = new JDBCConnector();
+				conn = jdbcCon.getConnection();
+				connCreated = true;
+			}
 			DomainVO domain = new DomainVO();
 			boolean result = false;
 			if (conn == null) {
@@ -236,7 +234,9 @@ public class SegmentMasterDAO {
 				if (stmt != null) {
 					try {
 						stmt.close();
-						conn.close();
+						if(connCreated) {
+							conn.close();
+						}
 					} catch (SQLException e) {
 						LOG.info("Error while closing connection" + e);
 					}
@@ -284,8 +284,12 @@ public class SegmentMasterDAO {
 			return urlLocMap;
 		}
 
-		public Map<String, String> readUrlHtmlLocforAllSegment(int crawlId) {
-			Connection conn = JDBCConnector.getConnection();
+		public Map<String, String> readUrlHtmlLocforAllSegment(int crawlId, Connection conn) {
+			boolean connCreated = false;
+			if(conn == null) {
+				conn = JDBCConnector.getConnection();
+				connCreated = true;
+			}
 			Map<String, String> urlHtmlLoc = new HashMap<String, String>();
 			if (conn == null) {
 				LOG.info("Connection not found. Could not create row in SEGMENT_URLS_DETAIL");
@@ -311,7 +315,9 @@ public class SegmentMasterDAO {
 				if (stmt != null) {
 					try {
 						stmt.close();
-						conn.close();
+						if(connCreated) {
+							conn.close();
+						}
 					} catch (SQLException e) {
 						LOG.info("Error while closing connection" + e);
 					}

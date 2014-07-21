@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,17 +14,11 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.nutch.crawl.CrawlDb;
-import org.apache.nutch.crawl.CrawlDbReader;
-import org.apache.nutch.crawl.Generator;
-import org.apache.nutch.crawl.Injector;
 import org.apache.nutch.crawl.dao.DomainDAO;
 import org.apache.nutch.crawl.dao.SegmentMasterDAO;
 import org.apache.nutch.crawl.vo.DomainVO;
-import org.apache.nutch.crawl.dao.UrlDAO;
 import org.apache.nutch.fetcher.Fetcher;
 import org.apache.nutch.parse.ParseSegment;
-import org.apache.nutch.segment.SegmentReader;
 import org.apache.nutch.util.NutchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +45,7 @@ public class Crawler {
 	 * @throws Exception
 	 */
 	public boolean crawlByDomain(String crawlDir, int numberOfRounds,
-			int domainId) throws Exception {
+			int domainId, List<String> url_pattern_rules) throws Exception {
 
 		DomainDAO domainDAO = new DomainDAO();
 		SegmentMasterDAO segmentDAO = new SegmentMasterDAO();
@@ -117,9 +110,14 @@ public class Crawler {
 			regexString.append(currentLine + "\n");
 		}
 		reader.close();
-		if(segmentUrlRules!=null && segmentUrlRules.size()>0){
+		if(url_pattern_rules !=null && url_pattern_rules.size()>0){
+			for (String urlRule : url_pattern_rules) {
+				regexString.append("-^" + domainVO.getUrl()+ "/" + urlRule+"\n");
+			}
+		}
+		else if(segmentUrlRules!=null && segmentUrlRules.size()>0){
 			for(String urlRule : segmentUrlRules){
-				regexString.append("-^" + domainVO.getUrl()+urlRule+"\n");
+				regexString.append("-^" + domainVO.getUrl()+ "/" + urlRule+"\n");
 			}
 		}
 		
