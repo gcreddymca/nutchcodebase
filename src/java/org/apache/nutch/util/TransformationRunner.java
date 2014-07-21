@@ -97,7 +97,7 @@ public class TransformationRunner implements Runnable{
 						conn.close();
 					}
 				} catch (SQLException e) {
-					LOG.info("Error while closing connection" + e);
+					LOG.info("Error while closing connection in TransformationRunner: urlTransformation method: " + e.getMessage());
 				}
 			}
 		}

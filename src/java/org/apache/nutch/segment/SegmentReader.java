@@ -733,7 +733,7 @@ public class SegmentReader extends Configured implements
 		Map<String, String> urlLocMapToReplace = new HashMap<String, String>();
 		urlLocMapToReplace = smDAO.readUrlHtmlLocforAllSegment(crawlId, null);
 		
-		ArrayList<Thread> transThreadList = new ArrayList<Thread>();
+		ExecutorService executor = Executors.newFixedThreadPool(20);
 		for (int i = 0; i < readers.length; i++) {
 			value = (Writable) valueClass.newInstance();
 			Text aKey = (Text) keyClass.newInstance();
@@ -745,26 +745,31 @@ public class SegmentReader extends Configured implements
 				String htmlFileName = RawHTMLFileCreationUtil.getRawHtmlContentFileName(keyString);
 				RawHTMLFileCreationUtil.createDirectories(defaultFolderHierarchy);
 				String newFileName = defaultFolderHierarchy + "/" + htmlFileName;
-				RawHTMLFileCreationUtil.createFile(newFileName);
-				PrintWriter pw = new PrintWriter(newFileName);
+				//Checking for content contains empty or not
 				String rawContent = new String(((Content) value).getContent());
-				rawContent = rawContent.replaceAll("\r\n", "");
-				rawContent = rawContent.replaceAll("\0", "");
-				pw.write(rawContent);
-				pw.flush();
-				pw.close();
-				//Thread creation process
-				TransformationRunner htmlThread = new TransformationRunner(urlLink,rawContent,crawlId,domainId,finalpath, urlLocMapToReplace, transformationMap, domainVO.getUrl());
-				Thread transThread = new Thread(htmlThread);
-				transThreadList.add(transThread);
-				transThread.start();
+				if(rawContent.trim()!=null && !rawContent.isEmpty()){
+					RawHTMLFileCreationUtil.createFile(newFileName);
+					PrintWriter pw = new PrintWriter(newFileName);
+					rawContent = rawContent.replaceAll("\r\n", "");
+					rawContent = rawContent.replaceAll("\0", "");
+					pw.write(rawContent);
+					pw.flush();
+					pw.close();
+					//Thread creation process
+					TransformationRunner htmlThread = new TransformationRunner(urlLink,rawContent,crawlId,domainId,finalpath, urlLocMapToReplace, transformationMap, domainVO.getUrl());
+					executor.execute(htmlThread);
+				}
+				else{
+					LOG.error("URL Does not have Content: ["+urlLink+"]");
+				}
 			}
 		}
 		readers[0].close();
-		for(Thread thread : transThreadList){
-			thread.join();
-			//LOG.info("Joining Thread No:"+transThreadList.size());
-		}
+		// and finish all existing threads in the queue
+	    executor.shutdown();
+	    while(!executor.isTerminated()){
+	    	//logger.info("Thread is waiting");
+	    }
 		LOG.info("All Threads has finished:");
 	}
 
