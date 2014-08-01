@@ -733,7 +733,7 @@ public class SegmentReader extends Configured implements
 		Map<String, String> urlLocMapToReplace = new HashMap<String, String>();
 		urlLocMapToReplace = smDAO.readUrlHtmlLocforAllSegment(crawlId, null);
 		
-		ExecutorService executor = Executors.newFixedThreadPool(20);
+		ExecutorService executor = Executors.newFixedThreadPool(15);
 		for (int i = 0; i < readers.length; i++) {
 			value = (Writable) valueClass.newInstance();
 			Text aKey = (Text) keyClass.newInstance();
@@ -750,8 +750,8 @@ public class SegmentReader extends Configured implements
 				if(rawContent.trim()!=null && !rawContent.isEmpty()){
 					RawHTMLFileCreationUtil.createFile(newFileName);
 					PrintWriter pw = new PrintWriter(newFileName);
-					rawContent = rawContent.replaceAll("\r\n", "");
-					rawContent = rawContent.replaceAll("\0", "");
+					//rawContent = rawContent.replaceAll("\r\n", "");
+					//rawContent = rawContent.replaceAll("\0", "");
 					pw.write(rawContent);
 					pw.flush();
 					pw.close();

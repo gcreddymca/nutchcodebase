@@ -81,7 +81,7 @@ public class TransformationRunner implements Runnable{
 						Iterator<String> iterator = transformations.iterator();
 						// Iterate through available transformations for segment
 						while (iterator.hasNext()) {
-							String method = iterator.next();
+							String method = iterator.next();rawHtml.contains("error");
 							//handle all transformations
 							rawHtml = tUtil.handleTransformations(rawHtml, method, domainUrl, url, crawlId, conn, requestParamsExclusionPatterns);
 						}
@@ -91,6 +91,7 @@ public class TransformationRunner implements Runnable{
 				}
 			} catch (Exception e) {
 				LOG.error(e.getLocalizedMessage());
+				e.printStackTrace();
 			}finally {
 				try {
 					if(conn!=null){

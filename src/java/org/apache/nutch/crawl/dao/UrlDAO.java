@@ -49,7 +49,7 @@ public class UrlDAO {
 			checkstmt = conn.prepareStatement(checkquery);
 			
 			String insertquery = "INSERT INTO URL_DETAIL (URL,STATUS,LAST_FETCH_TIME,LATEST_FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID,CRAWL_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
-			String updatequery = "UPDATE URL_DETAIL SET LAST_FETCH_TIME=?, LATEST_FETCH_TIME=?, MODIFIED_TIME=?, SEGMENT_ID=? where URL=? and CRAWL_ID=?";
+			String updatequery = "UPDATE URL_DETAIL SET MODIFIED_TIME=?, SEGMENT_ID=? where URL=? and CRAWL_ID=?";
 			stmt = conn.prepareStatement(insertquery);
 			updatestmt = conn.prepareStatement(updatequery);
 			
@@ -62,12 +62,12 @@ public class UrlDAO {
 				urlResultset = checkstmt.executeQuery();
 				
 				if (urlResultset != null && urlResultset.next()) {
-					updatestmt.setTimestamp(1, new Timestamp( url.getLastFetchTime()));
-					updatestmt.setTimestamp(2, new Timestamp( url.getLatestFetchTime()));
-					updatestmt.setTimestamp(3, new Timestamp( url.getModifiedTime()));
-					updatestmt.setInt(4, url.getSegmentId());
-					updatestmt.setString(5, url.getUrl());
-					updatestmt.setInt(6, crawlId);
+					//updatestmt.setTimestamp(1, new Timestamp( url.getLastFetchTime()));
+					//updatestmt.setTimestamp(2, new Timestamp( url.getLatestFetchTime()));
+					updatestmt.setTimestamp(1, new Timestamp( System.currentTimeMillis()));
+					updatestmt.setInt(2, url.getSegmentId());
+					updatestmt.setString(3, url.getUrl());
+					updatestmt.setInt(4, crawlId);
 					updatestmt.addBatch();
 					
 				}else{
@@ -85,9 +85,6 @@ public class UrlDAO {
 					stmt.setInt(12,crawlId);
 					stmt.addBatch();
 				}
-				
-				
-				
 				count++;
 				if (count == urlVOs.size() || count == maxStatements) {
 					updatestmt.executeBatch();
@@ -96,8 +93,6 @@ public class UrlDAO {
 					LOG.info("Batch job executed on URL_DETAIL");
 					count=0;
 				}
-				
-				
 			}
 			urlResultset.close();
 			result = true;
@@ -105,9 +100,7 @@ public class UrlDAO {
 			try{
 				conn.rollback();
 			}catch(SQLException s){
-				LOG.info(
-						"Error while rolling back"
-								+ s.getLocalizedMessage(), s);
+				LOG.info("Error while rolling back"+ s.getLocalizedMessage(), s);
 			}
 			LOG.info("Error while creating row in URL_DETAIL" + e.getLocalizedMessage(), e);
 		} finally {
@@ -115,7 +108,6 @@ public class UrlDAO {
 				try {
 					updatestmt.close();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					LOG.error(e.getLocalizedMessage());
 				}
 			}
@@ -123,20 +115,16 @@ public class UrlDAO {
 				try {
 					checkstmt.close();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					LOG.error(e.getLocalizedMessage());
 				}
 			}
 			if (stmt != null) {
-
 				try {
 					try{
 						conn.commit();
 					}catch(SQLException s){
 						conn.rollback();
-						LOG.info(
-								"Error while committing"
-										+ s.getLocalizedMessage(), s);
+						LOG.info("Error while committing"+ s.getLocalizedMessage(), s);
 					}
 					stmt.close();
 					conn.close();
@@ -144,11 +132,9 @@ public class UrlDAO {
 				} catch (SQLException e) {
 					Log.info("Error while closing connection", e);
 				}
-
 			}
 		}
 		return result;
-
 	}
 
 	public boolean createUrlDetail(UrlVO url) {
@@ -163,7 +149,6 @@ public class UrlDAO {
 		try {
 			String query = "INSERT INTO URL_DETAIL (URL,STATUS,LAST_FETCH_TIME,LATEST_FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID,CRAWL_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 			stmt = conn.prepareStatement(query);
-
 			stmt.setString(1, url.getUrl());
 			stmt.setInt(2, url.getStatus());
 			stmt.setTimestamp(3, new Timestamp( url.getLastFetchTime()));
@@ -183,25 +168,20 @@ public class UrlDAO {
 			try{
 				conn.rollback();
 			}catch(SQLException s){
-				LOG.info(
-						"Error while rolling back"
-								+ s.getLocalizedMessage(), s);
+				LOG.info("Error while rolling back"+ s.getLocalizedMessage(), s);
 			}
 			LOG.info("Error while creating row in URL_DETAIL" + e.getLocalizedMessage(), e);
 		} finally {
 			if (stmt != null) {
-
 				try {
 					stmt.close();
 					conn.close();
 				} catch (SQLException e) {
 					LOG.info("Error while closing connection", e);
 				}
-
 			}
 		}
 		return result;
-
 	}
 
 	public boolean update(Set<UrlVO> urlVOs) {
@@ -245,9 +225,7 @@ public class UrlDAO {
 			try{
 				conn.rollback();
 			}catch(SQLException s){
-				LOG.info(
-						"Error while rolling back"
-								+ s.getLocalizedMessage(), s);
+				LOG.info("Error while rolling back"+ s.getLocalizedMessage(), s);
 			}
 			LOG.info("Error while updating row in URL_DETAIL" + e.getLocalizedMessage(), e);
 		} finally {
@@ -259,11 +237,9 @@ public class UrlDAO {
 					Log.info("Error while closing connection");
 					e.printStackTrace();
 				}
-
 			}
 		}
 		return result;
-
 	}
 	
 	public boolean delete(){
