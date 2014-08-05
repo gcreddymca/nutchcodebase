@@ -747,7 +747,7 @@ public class SegmentReader extends Configured implements
 				String newFileName = defaultFolderHierarchy + "/" + htmlFileName;
 				//Checking for content contains empty or not
 				String rawContent = new String(((Content) value).getContent());
-				if(rawContent.trim()!=null && !rawContent.isEmpty()){
+				if(rawContent.trim()!=null && !rawContent.trim().isEmpty()){
 					RawHTMLFileCreationUtil.createFile(newFileName);
 					PrintWriter pw = new PrintWriter(newFileName);
 					//rawContent = rawContent.replaceAll("\r\n", "");

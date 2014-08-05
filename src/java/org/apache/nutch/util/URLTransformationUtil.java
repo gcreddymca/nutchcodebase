@@ -412,7 +412,7 @@ public class URLTransformationUtil {
 			Statement stmt = null;
 			try {
 				stmt= conn.createStatement();
-				String query = "UPDATE URL_HTML_LOC SET LAST_FETCH_TIME= '"+ date+"' WHERE URL= '"+url+"' and  CRAWL_ID= "+crawlId;
+				String query = "UPDATE URL_HTML_LOC SET LAST_FETCH_TIME= '"+ date+"', HTML_FILE_STATUS='0' WHERE URL= '"+url+"' and  CRAWL_ID= "+crawlId;
 				stmt.execute(query);
 				conn.commit();
 			} catch (SQLException e) {
