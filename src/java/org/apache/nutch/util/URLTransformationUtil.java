@@ -370,9 +370,8 @@ public class URLTransformationUtil {
 			rawHtml = excludeRequestParameters(rawHtml, requestParamsExclusionPatterns);
 		} 
 		else if(method.equals("removeSpecialChars")) {
-			rawHtml = rawHtml.replaceAll("\n", "");
-			rawHtml = rawHtml.replaceAll("\r\n", "");
-			rawHtml = rawHtml.replaceAll("\0", "");
+			   rawHtml = rawHtml.replaceAll("\r\n", "");
+			//rawHtml = rawHtml.replaceAll("\0", "");
 		} 
 		else if(method.equals("addHTMLizedComment")) {
 			String htmlizedStamp = addTimeStamptoURL(url,crawlId,conn);
@@ -435,7 +434,29 @@ public class URLTransformationUtil {
 		return htmlizedStamp;
 	}
 	
-	public  static String excludeRequestParameters(String url, Pattern[] requestParamsExclusionPatterns) {
+	public  String excludeRequestParameters(String rawHtml, Pattern[] requestParamsExclusionPatterns) {
+		String tempValue = null;
+		String hrefValue = null;
+		String hrefAttribute = null;
+		Matcher hrefMatcher = HREF_ATTRIBUTE.matcher(rawHtml);
+		// iterate through each href found in the htmlContent
+		while (hrefMatcher.find()) {
+			// Get href attribute from htmlContent
+			hrefAttribute = hrefMatcher.group();
+			hrefAttribute = hrefAttribute.replaceAll("\"", "");
+			// Get href attribute value
+			hrefValue = hrefAttribute.substring(hrefAttribute.indexOf("=") + 1,	hrefAttribute.length());
+			tempValue = hrefValue;
+			hrefValue = excludeParameter(hrefValue);
+			// Replace href Value in the htmlContent if it doesn't contain any file extensions
+			if (!tempValue.equals(hrefValue)) {
+				rawHtml = rawHtml.replaceAll("[\"]"+tempValue+"[\"]", "\""+hrefValue+"\"");
+			}
+		}
+		return rawHtml;
+	}
+	
+	public String excludeParameter(String url){
 		String urlPath = url;
 		if (url.endsWith(NutchConstants.HTML_EXTN))
 			return urlPath;

@@ -801,12 +801,15 @@ public class Fetcher extends Configured implements Tool,
                   temp = true;
                 }
                 output(fit.url, fit.datum, content, status, code);
+               
                 String newUrl = status.getMessage();
                 Text redirUrl =
                   handleRedirect(fit.url, fit.datum,
                                  urlString, newUrl, temp,
                                  Fetcher.PROTOCOL_REDIR);
                 if (redirUrl != null) {
+                	
+                  
                   CrawlDatum newDatum = new CrawlDatum(CrawlDatum.STATUS_DB_UNFETCHED,
                       fit.datum.getFetchInterval(), fit.datum.getScore());
                   // transfer existing metadata
@@ -978,7 +981,7 @@ public class Fetcher extends Configured implements Tool,
         
         // store the guessed content type in the crawldatum
         if (content.getContentType() != null) datum.getMetaData().put(new Text(Metadata.CONTENT_TYPE), new Text(content.getContentType()));
-        
+      
         // add segment to metadata
         metadata.set(Nutch.SEGMENT_NAME_KEY, segmentName);
         // add score to content metadata so that ParseSegment can pick it up.

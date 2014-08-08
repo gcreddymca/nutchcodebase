@@ -750,8 +750,6 @@ public class SegmentReader extends Configured implements
 				if(rawContent.trim()!=null && !rawContent.trim().isEmpty()){
 					RawHTMLFileCreationUtil.createFile(newFileName);
 					PrintWriter pw = new PrintWriter(newFileName);
-					//rawContent = rawContent.replaceAll("\r\n", "");
-					//rawContent = rawContent.replaceAll("\0", "");
 					pw.write(rawContent);
 					pw.flush();
 					pw.close();

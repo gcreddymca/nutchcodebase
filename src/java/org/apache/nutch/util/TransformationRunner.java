@@ -78,13 +78,15 @@ public class TransformationRunner implements Runnable{
 				if(!urlSegments.isEmpty()){
 					if(!transformationMap.isEmpty()) {
 						List<String> transformations = transformationMap.get(urlSegments.get(1));
-						Iterator<String> iterator = transformations.iterator();
-						// Iterate through available transformations for segment
-						while (iterator.hasNext()) {
-							String method = iterator.next();rawHtml.contains("error");
-							//handle all transformations
-							rawHtml = tUtil.handleTransformations(rawHtml, method, domainUrl, url, crawlId, conn, requestParamsExclusionPatterns);
-						}
+						if(transformations !=null && transformations.size()>0){
+							Iterator<String> iterator = transformations.iterator();
+							// Iterate through available transformations for segment
+							while (iterator.hasNext()) {
+								String method = iterator.next();
+								//handle all transformations
+								rawHtml = tUtil.handleTransformations(rawHtml, method, domainUrl, url, crawlId, conn, requestParamsExclusionPatterns);
+							}
+						}	
 					}
 					tUtil.writeContentToFile(finalpath.concat(urlSegments.get(0)), rawHtml);
 					urlSegments = null;
