@@ -28,6 +28,8 @@ public class URLTransformationUtil {
 			.getLogger(URLTransformationUtil.class);
 	private static final Pattern HREF_ATTRIBUTE = Pattern.compile(
 			"href=\"(.*?)\"", Pattern.DOTALL);
+	private static final Pattern ACTION_ATTRIBUTE = Pattern.compile(
+			"action=\"(.*?)\"", Pattern.DOTALL);
 
 	static {
 		conf = NutchConfiguration.create();
@@ -300,8 +302,10 @@ public class URLTransformationUtil {
 		String tempValue = null;
 		String hrefValue = null;
 		String hrefAttribute = null;
+		String actionValue = null;
+		String actionAttribute = null;
 		Matcher hrefMatcher = HREF_ATTRIBUTE.matcher(rawHtml);
-		// iterate through each href found in the htmlContent
+		// iterate through each href found in the rawHtmlContent
 		while (hrefMatcher.find()) {
 			// Get href attribute from htmlContent
 			hrefAttribute = hrefMatcher.group();
@@ -315,6 +319,24 @@ public class URLTransformationUtil {
 				if (hrefValue.contains(domainUrl)) {
 					hrefValue = hrefValue.replace(domainUrl, "");
 					rawHtml = rawHtml.replaceAll("[\"]"+tempValue+"[\"]", "\""+hrefValue+"\"");
+				}
+			}
+		}
+		Matcher actionMatcher = ACTION_ATTRIBUTE.matcher(rawHtml);
+		// iterate through each action found in the rawHtmlContent
+		while (actionMatcher.find()) {
+			// Get action attribute from htmlContent
+			actionAttribute = actionMatcher.group();
+			actionAttribute = actionAttribute.replaceAll("\"", "");
+			// Get action attribute value
+			actionValue = actionAttribute.substring(actionAttribute.indexOf("=") + 1,	actionAttribute.length());
+			tempValue = actionValue;
+			Matcher extnMatcher = RESOURCE_EXTNS.matcher(actionValue);
+			// Replace action Value in the htmlContent if it doesn't contain any file extensions
+			if (!(extnMatcher.find())) {
+				if (actionValue.contains(domainUrl)) {
+					actionValue = actionValue.replace(domainUrl, "");
+					rawHtml = rawHtml.replaceAll("[\"]"+tempValue+"[\"]", "\""+actionValue+"\"");
 				}
 			}
 		}
