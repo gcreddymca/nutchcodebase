@@ -183,6 +183,53 @@ public class UrlDAO {
 		}
 		return result;
 	}
+	
+	public boolean createSpecificUrlDetail(UrlVO url) {
+		Connection conn = JDBCConnector.getConnection();
+		int crawlId = getLiveCrawlId();
+		boolean result = false;
+		if (conn == null) {
+			LOG.info("Connection not found. Could not create row in URL_DETAIL");
+			return result;
+		}
+		PreparedStatement stmt = null;
+		try {
+			String query = "INSERT INTO URL_DETAIL (URL,STATUS,LAST_FETCH_TIME,LATEST_FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID,CRAWL_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
+			stmt = conn.prepareStatement(query);
+			stmt.setString(1, url.getUrl());
+			stmt.setInt(2, 2);
+			stmt.setTimestamp(3, new Timestamp( System.currentTimeMillis()));
+			stmt.setTimestamp(4, new Timestamp( System.currentTimeMillis()));
+			stmt.setTimestamp(5, new Timestamp( System.currentTimeMillis()));
+			stmt.setInt(6, 0);
+			stmt.setLong(7, 2592000);
+			stmt.setFloat(8, 0.0f);
+			stmt.setString(9, null);
+			stmt.setString(10, null);
+			stmt.setInt(11, url.getSegmentId());
+			stmt.setInt(12, crawlId);
+			stmt.execute();
+			result = true;
+			conn.commit();
+		} catch (SQLException e) {
+			try{
+				conn.rollback();
+			}catch(SQLException s){
+				LOG.info("Error while rolling back"+ s.getLocalizedMessage(), s);
+			}
+			LOG.info("Error while creating row in URL_DETAIL" + e.getLocalizedMessage(), e);
+		} finally {
+			if (stmt != null) {
+				try {
+					stmt.close();
+					conn.close();
+				} catch (SQLException e) {
+					LOG.info("Error while closing connection", e);
+				}
+			}
+		}
+		return result;
+	}
 
 	public boolean update(Set<UrlVO> urlVOs) {
 		Connection conn = JDBCConnector.getConnection();
