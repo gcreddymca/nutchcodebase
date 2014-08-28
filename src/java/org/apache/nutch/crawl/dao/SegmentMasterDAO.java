@@ -171,7 +171,7 @@ public class SegmentMasterDAO {
 	  Statement stmt = null;
 	  try {
 	   stmt = conn.createStatement();
-	   String query = "SELECT * from CREST.SEGMENT_MASTER where DOMAIN_ID="+domainId+" AND CRAWL="+0;
+	   String query = "SELECT * from SEGMENT_MASTER where DOMAIN_ID="+domainId+" AND CRAWL="+0;
 	   boolean success = stmt.execute(query);
 	   if (success) {
 	    ResultSet rs = stmt.getResultSet();
@@ -212,7 +212,7 @@ public class SegmentMasterDAO {
 			}
 			PreparedStatement stmt = null;
 			try {
-				String query = "SELECT * from CREST.DOMAIN where DOMAIN_ID = ?";
+				String query = "SELECT * from DOMAIN where DOMAIN_ID = ?";
 				stmt = conn.prepareStatement(query);
 				stmt.setInt(1, primaryKey);
 				result = stmt.execute();
@@ -260,7 +260,7 @@ public class SegmentMasterDAO {
 			Statement stmt = null;
 			try {
 				stmt = conn.createStatement();
-				String query = " SELECT * from CREST.URL_HTML_LOC where default_location=1 and SEGMENT_ID="+segmentId+" and CRAWL_ID="+crawlId;
+				String query = " SELECT * from URL_HTML_LOC where default_location=1 and SEGMENT_ID="+segmentId+" and CRAWL_ID="+crawlId;
 				boolean success = stmt.execute(query);
 				if (success) {
 					ResultSet rs = stmt.getResultSet();
@@ -298,7 +298,7 @@ public class SegmentMasterDAO {
 			Statement stmt = null;
 			try {
 				stmt = conn.createStatement();
-				String query = "SELECT * from CREST.URL_HTML_LOC where default_location=1 and CRAWL_ID="+crawlId;
+				String query = "SELECT * from URL_HTML_LOC where default_location=1 and CRAWL_ID="+crawlId;
 
 				boolean success = stmt.execute(query);
 				if (success) {

@@ -29,7 +29,7 @@ public class DomainDAO {
 		Statement stmt = null;
 		try {
 			stmt = conn.createStatement();
-			String query = " SELECT * FROM CREST.SEGMENT_MASTER MASTER WHERE DOMAIN_ID="
+			String query = " SELECT * FROM SEGMENT_MASTER MASTER WHERE DOMAIN_ID="
 					+ domainId + "ORDER BY PRIORITY";
 			boolean success = stmt.execute(query);
 			if (success) {
@@ -80,7 +80,7 @@ public class DomainDAO {
 		Statement stmt = null;
 		try {
 			stmt = conn.createStatement();
-			String query = " SELECT * FROM CREST.DOMAIN ";
+			String query = " SELECT * FROM DOMAIN ";
 			boolean success = stmt.execute(query);
 			if (success) {
 				ResultSet rs = stmt.getResultSet();
@@ -126,7 +126,7 @@ public class DomainDAO {
 		PreparedStatement stmt = null;
 		try {
 
-			String query = " SELECT * FROM CREST.DOMAIN where DOMAIN_ID=?";
+			String query = " SELECT * FROM DOMAIN where DOMAIN_ID=?";
 			stmt = conn.prepareStatement(query);
 			stmt.setInt(1, domainId);
 			boolean success = stmt.execute();
