@@ -129,15 +129,15 @@ public class URLTransformationUtil {
 				 catch(SQLException e){
 					 LOG.error(e.getMessage());
 				 }finally {
-					 if (stmt != null) {
-						 try {
+					 try {
+						 if (stmt != null) {
 							 stmt.close();
-							 if(connCreated) {
-								 conn.close();
-							 }
-					 	 } catch (SQLException e) {
-					 		 LOG.info("Error while closing connection" + e.getMessage());
 						 }
+						 if(connCreated) {
+							 conn.close();
+						 }
+				 	 } catch (SQLException e) {
+				 		 LOG.info("Error while closing connection" + e.getMessage());
 					 }
 				 }
 		     }
@@ -147,35 +147,47 @@ public class URLTransformationUtil {
 	
 	public  List<String> getURLHTMLLOC(String url, int crawlId, Connection conn) {
 		List<String> urlSegments = new ArrayList<String>();
+		boolean connCreated = false;
 		if(url.equals("/")){
 			urlSegments.add("/index.html");
 		 }else{
-		if (conn != null) {
-		  Statement stmt = null;
-		  ResultSet rs = null;
-		 try{
-			 stmt = conn.createStatement();
-			 String query = "SELECT URL_LOC, SEGMENT_ID FROM URL_HTML_LOC WHERE url= '"+url+"' and CRAWL_ID="+crawlId;
-			 stmt.execute(query);
-			 rs = stmt.getResultSet();
-			 if(rs.next()){
-				 urlSegments.add(rs.getString("URL_LOC"));
-				 urlSegments.add(String.valueOf(rs.getInt("SEGMENT_ID")));
-			 }
-		} catch(SQLException e){
-			 LOG.error("Error in getUrlHtmlLoc method:"+e.getMessage());
-		}
-		 finally {
-			if (stmt != null) {
-			try {
-				stmt.close();
-				rs.close();
-				} catch (SQLException e) {
-				LOG.error(e.getMessage());
+			 try {
+					if(conn == null || conn.isClosed()) {
+						conn = JDBCConnector.getConnection();
+						connCreated= true;
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
 				}
-			  }
-			}
-		   }
+			 	if(conn !=null ) {
+				  Statement stmt = null;
+				  ResultSet rs = null;
+				 try{
+					 stmt = conn.createStatement();
+					 String query = "SELECT URL_LOC, SEGMENT_ID FROM URL_HTML_LOC WHERE url= '"+url+"' and CRAWL_ID="+crawlId;
+					 //stmt.execute(query);
+					 rs = stmt.executeQuery(query);
+					 //rs = stmt.getResultSet();
+					 if(rs.next()){
+						 urlSegments.add(rs.getString("URL_LOC"));
+						 urlSegments.add(String.valueOf(rs.getInt("SEGMENT_ID")));
+					 }
+				} catch(SQLException e){
+					 LOG.error("Error while executing getUrlHtmlLoc method:"+e.getMessage());
+				}
+				 finally {
+					try {
+						if (stmt != null) {
+							stmt.close();
+						}
+						if(connCreated) {
+							 conn.close();
+						 }
+						} catch (SQLException e) {
+						LOG.error("Error while closing connection in getUrlHtmlLoc method:"+e.getMessage());
+						}
+					}
+			 }
 		 }
 		return urlSegments;
 	}
@@ -434,20 +446,21 @@ public class URLTransformationUtil {
 			try {
 				stmt= conn.createStatement();
 				String query = "UPDATE URL_HTML_LOC SET LAST_FETCH_TIME= '"+ date+"', HTML_FILE_STATUS='0' WHERE URL= '"+url+"' and  CRAWL_ID= "+crawlId;
-				stmt.execute(query);
+				//stmt.execute(query);
+				stmt.executeUpdate(query);
 				conn.commit();
 			} catch (SQLException e) {
 				LOG.error("Error while executing update LAST_FETCH_TIME in URL_HTML_LOC table :" + e.getMessage());
 			}finally {
-				if (stmt != null) {
-					try {
-						stmt.close();
-						if(connCreated){
-							   conn.close();
-						}
-					} catch (SQLException e) {
-						LOG.info("Error while closing Statement: " + e.getMessage());
+				try {
+					if (stmt != null) {
+					stmt.close();
 					}
+					if(connCreated){
+						conn.close();
+					}
+				} catch (SQLException e) {
+					LOG.error("Error while closing Connection in addTimeStamptoURL method:" + e.getMessage());
 				}
 			}
 		} else{
