@@ -66,7 +66,7 @@ public class JDBCConnector {
 		return conn;
 	}
 	
-	public static Connection getConnection() {
+	public static synchronized Connection getConnection() {
 		try {
 			prop.load(new FileInputStream(System.getProperty("DBProperties")));
 			ctx = new InitialContext();

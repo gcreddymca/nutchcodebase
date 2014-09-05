@@ -733,7 +733,7 @@ public class SegmentReader extends Configured implements
 		Map<String, String> urlLocMapToReplace = new HashMap<String, String>();
 		urlLocMapToReplace = smDAO.readUrlHtmlLocforAllSegment(crawlId, null);
 		
-		ExecutorService executor = Executors.newFixedThreadPool(15);
+		ExecutorService executor = Executors.newFixedThreadPool(20);
 		for (int i = 0; i < readers.length; i++) {
 			value = (Writable) valueClass.newInstance();
 			Text aKey = (Text) keyClass.newInstance();
