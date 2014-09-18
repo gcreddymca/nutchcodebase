@@ -90,6 +90,7 @@ public class Generator extends Configured implements Tool {
 
 	// deprecated parameters
 	public static final String GENERATE_MAX_PER_HOST_BY_IP = "generate.max.per.host.by.ip";
+	public static int domainId = 0;
 
 	public static class SelectorEntry implements Writable {
 		public Text url;
@@ -154,7 +155,7 @@ public class Generator extends Configured implements Tool {
 		private Map<String,UrlVO> urlMap;
 
 		public void configure(JobConf job) {
-			List<SegmentVO> segmentList = new ArrayList<SegmentVO>();
+			
 			DomainDAO domainDao = new DomainDAO();
 			curTime = job.getLong(GENERATOR_CUR_TIME,
 					System.currentTimeMillis());
@@ -190,14 +191,15 @@ public class Generator extends Configured implements Tool {
 			if (conf.getBoolean("generate.save.urls.in.segments", false)) {
 				domainList = domainDao.read();
 				UrlDAO urlDAO = new UrlDAO();
-				urlMap = urlDAO.read();
+				urlMap = urlDAO.read(domainId);
 				// Read segments for each domain and update DomainList with
 				// corresponding segmentListVos
+				List<SegmentVO> segmentList = null;//new ArrayList<SegmentVO>();
 				for (DomainVO domain : domainList) {
-					segmentList.clear();
+					//segmentList.clear();
 					segmentList = domainDao.readSegmentsFromDomain(domain
 							.getDomainId());
-					SegmentVO defaultSeg = segmentList.get(0);
+					//SegmentVO defaultSeg = segmentList.get(0);
 					//commented as part of default segment priority changed to 9999
 					/*if(defaultSeg.getSegmentName().equalsIgnoreCase("default")) {
 						segmentList.remove(0);
@@ -406,7 +408,7 @@ public class Generator extends Configured implements Tool {
 					for (DomainVO domain : domainList) {
 						// if match found
 						
-						if (urlToSave.startsWith(domain.getUrl())) {
+						if (urlToSave.startsWith(domain.getUrl()+domain.getSeedUrl())) {
 							
 							/*String seedUrlInDomain = domain.getUrl();
 							if(domain.getUrl().lastIndexOf("/") != -1) {
@@ -487,14 +489,14 @@ public class Generator extends Configured implements Tool {
 			if (conf.getBoolean("generate.save.urls.in.segments", false)) {
 				// create entry in Url_Detail Table with updated urlList
 				if(urlList.size() > 0){
-					boolean listCreated = urlCrud.create(urlList);
+					boolean listCreated = urlCrud.create(urlList,domainId);
 					if(!listCreated){
 						LOG.info("Error occurred while updating db with urls");
 						//throw new IOException();
 					}
 				}
 				if(urlListDef.size() > 0){
-					boolean defListCreated = urlCrud.create(urlListDef);
+					boolean defListCreated = urlCrud.create(urlListDef,domainId);
 					if(!defListCreated){
 						LOG.info("Error occurred while updating db with urls");
 						//throw new IOException();

@@ -78,6 +78,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class CrawlDbReader implements Closeable {
+	public static int  domainId = 0;
 
 	public static final Logger LOG = LoggerFactory
 			.getLogger(CrawlDbReader.class);
@@ -503,7 +504,7 @@ public class CrawlDbReader implements Closeable {
 		Set<UrlVO> urlList = new HashSet<UrlVO>();
 		DomainDAO domainDAO = new DomainDAO();
 		UrlDAO urlDAO = new UrlDAO();
-		Map<String,UrlVO> urlMap = urlDAO.read();
+		Map<String,UrlVO> urlMap = urlDAO.read(domainId);
 		List<DomainVO> domainList = domainDAO.read();
 		UrlVO urlVO = null;
 		for (int i = 0; i < readers.length; i++) {

@@ -141,7 +141,7 @@ public class Crawler {
 		String[] args = null;
 		try {
 
-			success = crawl(numberOfRounds, seedUrl, crawldbPath, segmentPath);
+			success = crawl(numberOfRounds, seedUrl, crawldbPath, segmentPath, domainId);
 			if (success) {
 				domainVO.setCrawlStatus("DONE");
 				domainDAO.updateCrawlStatus(domainVO);
@@ -163,6 +163,7 @@ public class Crawler {
 			args[0] = crawldbPath;
 			args[1] = "-dbDump";
 			try {
+				CrawlDbReader.domainId=domainId;
 				CrawlDbReader.main(args);
 			} catch (IOException i) {
 
@@ -210,7 +211,7 @@ public class Crawler {
 	 */
 
 	private boolean crawl(int numberOfRounds, URL seedUrl, String crawldbPath,
-			String segmentPath) throws Exception {
+			String segmentPath, int domainId) throws Exception {
 		String[] args;
 		File[] listOfSegments = null;
 		File segmentPathFile = new File(segmentPath);
@@ -239,7 +240,7 @@ public class Crawler {
 			args = new String[GENERATOR_ARGS_LEN];
 			args[0] = crawldbPath;
 			args[1] = segmentPath;
-
+			Generator.domainId = domainId;
 			Generator.main(args);
 
 			segmentPathFile = new File(segmentPath);
@@ -295,7 +296,7 @@ public class Crawler {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean crawlAllDomains(String crawlDir, int numberOfRounds)
+	public boolean crawlAllDomains(String crawlDir, int numberOfRounds, int domainId)
 			throws Exception {
 		boolean success = false;
 		DomainDAO domainDAO = new DomainDAO();
@@ -364,7 +365,7 @@ public class Crawler {
 		String[] args = null;
 		try {
 
-			success = crawl(numberOfRounds, seedUrl, crawldbPath, segmentPath);
+			success = crawl(numberOfRounds, seedUrl, crawldbPath, segmentPath, domainId);
 			if (success) {
 				for (DomainVO domainVO : domainVOs) {
 					domainVO.setCrawlStatus("FAILED");
