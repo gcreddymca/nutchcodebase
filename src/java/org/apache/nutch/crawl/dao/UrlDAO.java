@@ -30,7 +30,7 @@ public class UrlDAO {
 		int connectioncount=CONNECTIONCOUNT;
 		int crawlId = getCrawlId(domainId);
 		if(crawlId == 0){
-			crawlId = getLiveCrawlId();
+			crawlId = getLiveCrawlId(domainId);
 		}
 		 
 		boolean result = false;
@@ -187,9 +187,9 @@ public class UrlDAO {
 		return result;
 	}
 	
-	public boolean createSpecificUrlDetail(UrlVO url, int crawlId, int domainId) {
+	public boolean createSpecificUrlDetail(UrlVO url,int crawlId,int domainId) {
 		Connection conn = JDBCConnector.getConnection();
-		//int crawlId = getLiveCrawlId();
+		//int crawlId = getLiveCrawlId(domainId);
 		boolean result = false;
 		if (conn == null) {
 			LOG.info("Connection not found. Could not create row in URL_DETAIL");
@@ -197,7 +197,7 @@ public class UrlDAO {
 		}
 		PreparedStatement stmt = null;
 		try {
-			String query = "INSERT INTO URL_DETAIL (URL,STATUS,LAST_FETCH_TIME,LATEST_FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID,CRAWL_ID, DOMAIN_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			String query = "INSERT INTO URL_DETAIL (URL,STATUS,LAST_FETCH_TIME,LATEST_FETCH_TIME,MODIFIED_TIME,RETRIES_SINCE_FETCH,RETRY_INTERVAL,SCORE,SIGNATURE,METADATA,SEGMENT_ID,CRAWL_ID,DOMAIN_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
 			stmt = conn.prepareStatement(query);
 			stmt.setString(1, url.getUrl());
 			stmt.setInt(2, 2);
@@ -418,7 +418,7 @@ public class UrlDAO {
 	 * returns Live crawl id
 	 * @return
 	 */
-	public int getLiveCrawlId(){
+	public int getLiveCrawlId(int domainId){
 		Connection conn = JDBCConnector.getConnection();
 		//System.out.println("getting crawlid");
 		int crawl_id = 0;
@@ -427,7 +427,7 @@ public class UrlDAO {
 			try {
 				stmt = conn.createStatement();
 				
-				String query = "SELECT CRAWL_ID FROM CRAWL_MASTER WHERE LIVE=1";
+				String query = "SELECT CRAWL_ID FROM CRAWL_MASTER WHERE LIVE=1 and DOMAIN_ID="+domainId;
 				stmt.execute(query);
 				ResultSet rs = stmt.getResultSet();
 				if(rs.next())

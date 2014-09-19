@@ -366,7 +366,7 @@ public class TransformationRunner implements Runnable{
 			writer.close();
 			file = null;
 		} catch (IOException e) {
-			LOG.error(e.getLocalizedMessage());
+			LOG.error("Error while writing content in writeContentToFile() method:   "+path+"   " +e.getLocalizedMessage());
 		}
 	}
 	
