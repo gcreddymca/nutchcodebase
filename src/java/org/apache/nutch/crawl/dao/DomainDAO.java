@@ -80,7 +80,7 @@ public class DomainDAO {
 		Statement stmt = null;
 		try {
 			stmt = conn.createStatement();
-			String query = " SELECT * FROM DOMAIN ";
+			String query = " SELECT * FROM DOMAIN ORDER BY DOMAIN_NAME desc";
 			boolean success = stmt.execute(query);
 			if (success) {
 				ResultSet rs = stmt.getResultSet();
