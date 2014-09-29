@@ -788,7 +788,7 @@ public class Fetcher extends Configured implements Tool,
                   }
                 }
                 break;
-
+              case ProtocolStatus.NOTFOUND:
               case ProtocolStatus.MOVED:         // redirect
               case ProtocolStatus.TEMP_MOVED:
                 int code;
@@ -809,7 +809,6 @@ public class Fetcher extends Configured implements Tool,
                                  Fetcher.PROTOCOL_REDIR);
                 if (redirUrl != null) {
                 	
-                  
                   CrawlDatum newDatum = new CrawlDatum(CrawlDatum.STATUS_DB_UNFETCHED,
                       fit.datum.getFetchInterval(), fit.datum.getScore());
                   // transfer existing metadata
@@ -829,7 +828,8 @@ public class Fetcher extends Configured implements Tool,
                     redirecting = false;
                     reporter.incrCounter("FetcherStatus", "FetchItem.notCreated.redirect", 1);
                   }
-                } else {
+                
+                	} else {
                   // stop redirecting
                   redirecting = false;
                 }
@@ -837,6 +837,7 @@ public class Fetcher extends Configured implements Tool,
 
               case ProtocolStatus.EXCEPTION:
                 logError(fit.url, status.getMessage());
+                output(fit.url, fit.datum, content, status, CrawlDatum.STATUS_DB_UNFETCHED);
                 int killedURLs = fetchQueues.checkExceptionThreshold(fit.getQueueID());
                 if (killedURLs!=0)
                    reporter.incrCounter("FetcherStatus", "AboveExceptionThresholdInQueue", killedURLs);
@@ -847,7 +848,6 @@ public class Fetcher extends Configured implements Tool,
                 break;
 
               case ProtocolStatus.GONE:           // gone
-              case ProtocolStatus.NOTFOUND:
               case ProtocolStatus.ACCESS_DENIED:
               case ProtocolStatus.ROBOTS_DENIED:
                 output(fit.url, fit.datum, null, status, CrawlDatum.STATUS_FETCH_GONE);

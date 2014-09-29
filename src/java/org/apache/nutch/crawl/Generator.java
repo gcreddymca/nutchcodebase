@@ -331,6 +331,8 @@ public class Generator extends Configured implements Tool {
 				SelectorEntry entry = values.next();
 				Text url = entry.url;
 				String urlString = url.toString();
+				
+				
 				URL u = null;
 
 				String hostordomain = null;
@@ -403,6 +405,8 @@ public class Generator extends Configured implements Tool {
 				}
 				if (conf.getBoolean("generate.save.urls.in.segments", false)) {
 					String urlToSave = url.toString();
+					//String urlWithoutSlash = null;
+					
 					// Iterate through all domain and find the domain which
 					// matches the url
 					for (DomainVO domain : domainList) {
@@ -425,6 +429,9 @@ public class Generator extends Configured implements Tool {
 							String domainUrl = extractDomainIfIncludesSeedUrl(domain.getUrl());
 							// rip out domain Name from Url
 							urlToSave = urlToSave.replaceAll(domain.getUrl(),"");
+							/*if(urlToSave.endsWith("/")){
+								urlWithoutSlash = urlToSave.substring(0, urlToSave.length()-1);
+							}*/
 							if(urlToSave.length() == 0){
 								urlToSave = "/";
 							}
@@ -441,7 +448,7 @@ public class Generator extends Configured implements Tool {
 										if (segment.isCrawl()) {
 												output.collect(key, entry);
 										}
-
+										
 										if (!(urlMap.containsKey(urlToSave)
 												|| urlMap
 														.containsKey(urlToSave
@@ -449,7 +456,16 @@ public class Generator extends Configured implements Tool {
 											// create urlVO for each url
 											urlVO.setSegmentId(segment
 													.getSegmentId());
-											
+											//adding "/" at the end of the url
+											/*if(!urlToSave.endsWith(".jsp")){
+												if(!urlToSave.endsWith("/")){
+													urlVO.setUrl(urlToSave+"/");
+												}else{
+													urlVO.setUrl(urlToSave);
+												}
+											}else{
+											urlVO.setUrl(urlToSave);
+											}*/
 											urlVO.setUrl(urlToSave);
 											urlList.add(urlVO);
 											urlMap.put(urlToSave, urlVO);
@@ -467,6 +483,15 @@ public class Generator extends Configured implements Tool {
 									// create urlVO for each url
 									urlVODef.setSegmentId(segment
 											.getSegmentId());
+									/*if(!urlToSave.endsWith(".jsp")){
+										if(!urlToSave.endsWith("/")){
+											urlVODef.setUrl(urlToSave+"/");
+										}else{
+											urlVODef.setUrl(urlToSave);
+										}
+									}else{
+										urlVODef.setUrl(urlToSave);
+									}*/
 									urlVODef.setUrl(urlToSave);
 									if (!(urlMap.containsKey(urlToSave)
 											|| urlMap

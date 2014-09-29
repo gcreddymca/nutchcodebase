@@ -18,7 +18,6 @@ package org.apache.nutch.segment;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -67,10 +66,12 @@ import org.apache.nutch.crawl.vo.DomainVO;
 import org.apache.nutch.parse.ParseData;
 import org.apache.nutch.parse.ParseText;
 import org.apache.nutch.protocol.Content;
+import org.apache.nutch.protocol.ProtocolStatus;
 import org.apache.nutch.util.HadoopFSUtil;
 import org.apache.nutch.util.NutchConfiguration;
 import org.apache.nutch.util.NutchJob;
 import org.apache.nutch.util.RawHTMLFileCreationUtil;
+import org.apache.nutch.util.StatusCodeMessages;
 import org.apache.nutch.util.TransformationRunner;
 import org.apache.nutch.util.URLTransformationUtil;
 import org.slf4j.Logger;
@@ -525,10 +526,11 @@ public class SegmentReader extends Configured implements
 		}
 	}
 
-	public void getStats(Path segment, final SegmentReaderStats stats)
-			throws Exception {
+	public Map<String,Integer> getResponseURLCodes(Path segment, final SegmentReaderStats stats) throws Exception{
+		Map<String,Integer> urlResponseCodes = new HashMap<String,Integer>();
 		SequenceFile.Reader[] readers = SequenceFileOutputFormat.getReaders(
 				getConf(), new Path(segment, CrawlDatum.GENERATE_DIR_NAME));
+		//List<String> urlList = new ArrayList<String>();
 		long cnt = 0L;
 		Text key = new Text();
 		for (int i = 0; i < readers.length; i++) {
@@ -547,6 +549,80 @@ public class SegmentReader extends Configured implements
 					fetchDir, getConf());
 			for (int i = 0; i < mreaders.length; i++) {
 				while (mreaders[i].next(key, value)) {
+				int responseCode = ((ProtocolStatus)value.getMetaData().get(new Text("_pst_"))).getCode();
+				//System.out.println("======Response code is========"+responseCode+"======URL IS===="+key.toString()+"=============");
+					if(responseCode != 1 ){
+						if(!urlResponseCodes.containsKey(key.toString())){
+							urlResponseCodes.put(key.toString(), responseCode);
+						}
+					}
+					cnt++;
+					if (value.getFetchTime() < start)
+						start = value.getFetchTime();
+					if (value.getFetchTime() > end)
+						end = value.getFetchTime();
+				}
+				mreaders[i].close();
+			}
+			stats.start = start;
+			stats.end = end;
+			stats.fetched = cnt;
+		}
+		Path parseDir = new Path(segment, ParseData.DIR_NAME);
+		if (fs.exists(parseDir) && fs.getFileStatus(parseDir).isDir()) {
+			cnt = 0L;
+			long errors = 0L;
+			ParseData value = new ParseData();
+			MapFile.Reader[] mreaders = MapFileOutputFormat.getReaders(fs,
+					parseDir, getConf());
+			for (int i = 0; i < mreaders.length; i++) {
+				while (mreaders[i].next(key, value)) {
+					cnt++;
+					if (!value.getStatus().isSuccess())
+						errors++;
+				}
+				mreaders[i].close();
+			}
+			stats.parsed = cnt;
+			stats.parseErrors = errors;
+		}
+		//return urlList;
+		return urlResponseCodes;
+	}
+	
+	
+	public void getStats(Path segment, final SegmentReaderStats stats)
+			throws Exception {
+		SequenceFile.Reader[] readers = SequenceFileOutputFormat.getReaders(
+				getConf(), new Path(segment, CrawlDatum.GENERATE_DIR_NAME));
+		//List<String> urlList = new ArrayList<String>();
+		long cnt = 0L;
+		Text key = new Text();
+		for (int i = 0; i < readers.length; i++) {
+			while (readers[i].next(key))
+				cnt++;
+			readers[i].close();
+		}
+		stats.generated = cnt;
+		Path fetchDir = new Path(segment, CrawlDatum.FETCH_DIR_NAME);
+		if (fs.exists(fetchDir) && fs.getFileStatus(fetchDir).isDir()) {
+			cnt = 0L;
+			long start = Long.MAX_VALUE;
+			long end = Long.MIN_VALUE;
+			CrawlDatum value = new CrawlDatum();
+			MapFile.Reader[] mreaders = MapFileOutputFormat.getReaders(fs,
+					fetchDir, getConf());
+			for (int i = 0; i < mreaders.length; i++) {
+				while (mreaders[i].next(key, value)) {
+				/*	
+					int responseCode = ((ProtocolStatus)value.getMetaData().get(new Text("_pst_"))).getCode();
+					System.out.println("=========Response code is ======="+responseCode);
+					if(responseCode == 12 || responseCode == 13){
+						urlList.add(key.toString());
+					}
+				//	System.out.println("==========Value is======="+ ((ProtocolStatus)value.getMetaData().get(new Text("_pst_"))).getCode()+"=================");
+					//System.out.println("==========Value is======="+value+"=================");
+					*/
 					cnt++;
 					if (value.getFetchTime() < start)
 						start = value.getFetchTime();
@@ -721,7 +797,11 @@ public class SegmentReader extends Configured implements
 			throws Exception {
 		LOG.info("SegmentReader: splitContent '" + segment + "'");
 		SegmentMasterDAO smDAO = new SegmentMasterDAO();
+		StatusCodeMessages statusMessages = new StatusCodeMessages();
 		DomainVO domainVO = smDAO.readByPrimaryKey(domainId, null);
+		SegmentReader.SegmentReaderStats stats = new SegmentReader.SegmentReaderStats();
+		Map<String,Integer> urlResponseCodes = getResponseURLCodes(segment, stats);
+		//List<String> redirectedUrls = getStats(segment,stats);
 		MapFile.Reader[] readers = MapFileOutputFormat.getReaders(fs, new Path(segment, Content.DIR_NAME), getConf());
 		Class<?> keyClass = readers[0].getKeyClass();
 		Class<?> valueClass = readers[0].getValueClass();
@@ -737,28 +817,60 @@ public class SegmentReader extends Configured implements
 		for (int i = 0; i < readers.length; i++) {
 			value = (Writable) valueClass.newInstance();
 			Text aKey = (Text) keyClass.newInstance();
-			while (readers[i].next(aKey, value)) {
-				String keyString = aKey.toString();
-				String[] split = keyString.split(domainVO.getUrl());
-				String urlLink = split[1];
-				String defaultFolderHierarchy = RawHTMLFileCreationUtil.getDefaultFolderHierarchy(keyString, output);
-				String htmlFileName = RawHTMLFileCreationUtil.getRawHtmlContentFileName(keyString);
-				RawHTMLFileCreationUtil.createDirectories(defaultFolderHierarchy);
-				String newFileName = defaultFolderHierarchy + "/" + htmlFileName;
-				//Checking for content contains empty or not
-				String rawContent = new String(((Content) value).getContent());
-				if(rawContent != null && !rawContent.trim().isEmpty()){
-					RawHTMLFileCreationUtil.createFile(newFileName);
-					PrintWriter pw = new PrintWriter(newFileName);
-					pw.write(rawContent);
-					pw.flush();
-					pw.close();
-					//Thread creation process
-					TransformationRunner htmlThread = new TransformationRunner(urlLink,rawContent,crawlId,domainId,finalpath, urlLocMapToReplace, transformationMap, domainVO.getUrl());
-					executor.execute(htmlThread);
-				}
-				else{
-					LOG.error("URL Does not have Content: ["+urlLink+"]");
+			//System.out.println("=====URL is======="+aKey.toString()+"=============");
+			while (readers[i].next(aKey, value)) { 
+			
+				//writing the content into files of urls which other than 302 ,400,500 
+				if(!urlResponseCodes.containsKey(aKey.toString())) {
+					String keyString = aKey.toString();
+					String[] split = keyString.split(domainVO.getUrl());
+					String urlLink = split[1];
+					String defaultFolderHierarchy = RawHTMLFileCreationUtil.getDefaultFolderHierarchy(keyString, output);
+					String htmlFileName = RawHTMLFileCreationUtil.getRawHtmlContentFileName(keyString);
+					RawHTMLFileCreationUtil.createDirectories(defaultFolderHierarchy);
+					String newFileName = defaultFolderHierarchy + "/" + htmlFileName;
+					//Checking for content contains empty or not
+					String rawContent = new String(((Content) value).getContent());
+					if(rawContent != null && !rawContent.trim().isEmpty()){
+						RawHTMLFileCreationUtil.createFile(newFileName);
+						PrintWriter pw = new PrintWriter(newFileName);
+						pw.write(rawContent);
+						pw.flush();
+						pw.close();
+						//Thread creation process
+						TransformationRunner htmlThread = new TransformationRunner(urlLink,rawContent,crawlId,domainId,finalpath, urlLocMapToReplace, transformationMap, domainVO.getUrl());
+						executor.execute(htmlThread);
+					}
+					else{
+						LOG.error("URL Does not have Content: ["+urlLink+"]");
+					}
+				}else{
+						String message = null;
+						String url = aKey.toString().replace(domainVO.getUrl(), "");
+						if(urlResponseCodes.get(aKey.toString())!= null){
+							message = statusMessages.getStatusMessage(urlResponseCodes.get(aKey.toString()));
+						}
+						//System.out.println("In else block=====URL IS==="+url+"==="+urlResponseCodes.get(aKey.toString())+"======");
+						/*switch (urlResponseCodes.get(aKey.toString())) {
+							case 12:
+									message = "Moved Permanently";
+									break;
+							case 13:
+									message = "Moved Temporarily";
+									break;
+							case 14:
+									message = "Page Not Found";
+									break;
+							case 16:
+									message = "Internal Server Error";
+									break;
+
+						default:
+							break;
+						}
+						*/
+						URLTransformationUtil uUtil = new URLTransformationUtil();
+						uUtil.updateLastFetchTime(message,url,crawlId);
 				}
 			}
 		}

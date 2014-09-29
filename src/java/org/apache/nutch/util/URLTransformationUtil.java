@@ -519,4 +519,37 @@ public class URLTransformationUtil {
 		return urlPath;
 	}
 	
-}
+	public void updateLastFetchTime(String message,String url,int crawlId){
+		
+		Connection conn = JDBCConnector.getConnection();	
+		if(conn != null){
+			Statement stmt =null;
+			try {
+				stmt = conn.createStatement();
+				String query = "UPDATE URL_HTML_LOC SET LAST_FETCH_TIME= '"+ message+"', HTML_FILE_STATUS='0' WHERE URL= '"+url+"' and  CRAWL_ID= "+crawlId;
+				stmt.execute(query);
+				conn.commit();
+			} catch (SQLException e) {
+				LOG.error("Error while creating statement"+e.getMessage());
+			}finally{
+				
+				try {
+						if (stmt != null) {
+							stmt.close();
+							}
+						if(conn != null){
+							conn.close();
+						}
+					} catch (SQLException e) {
+							LOG.error("Error while closing statement"+e.getMessage());
+					}
+						
+					}
+					
+			}
+			
+		
+		}
+		
+	}
+
