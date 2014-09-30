@@ -530,7 +530,6 @@ public class SegmentReader extends Configured implements
 		Map<String,Integer> urlResponseCodes = new HashMap<String,Integer>();
 		SequenceFile.Reader[] readers = SequenceFileOutputFormat.getReaders(
 				getConf(), new Path(segment, CrawlDatum.GENERATE_DIR_NAME));
-		//List<String> urlList = new ArrayList<String>();
 		long cnt = 0L;
 		Text key = new Text();
 		for (int i = 0; i < readers.length; i++) {
@@ -550,7 +549,6 @@ public class SegmentReader extends Configured implements
 			for (int i = 0; i < mreaders.length; i++) {
 				while (mreaders[i].next(key, value)) {
 				int responseCode = ((ProtocolStatus)value.getMetaData().get(new Text("_pst_"))).getCode();
-				//System.out.println("======Response code is========"+responseCode+"======URL IS===="+key.toString()+"=============");
 					if(responseCode != 1 ){
 						if(!urlResponseCodes.containsKey(key.toString())){
 							urlResponseCodes.put(key.toString(), responseCode);
@@ -614,15 +612,6 @@ public class SegmentReader extends Configured implements
 					fetchDir, getConf());
 			for (int i = 0; i < mreaders.length; i++) {
 				while (mreaders[i].next(key, value)) {
-				/*	
-					int responseCode = ((ProtocolStatus)value.getMetaData().get(new Text("_pst_"))).getCode();
-					System.out.println("=========Response code is ======="+responseCode);
-					if(responseCode == 12 || responseCode == 13){
-						urlList.add(key.toString());
-					}
-				//	System.out.println("==========Value is======="+ ((ProtocolStatus)value.getMetaData().get(new Text("_pst_"))).getCode()+"=================");
-					//System.out.println("==========Value is======="+value+"=================");
-					*/
 					cnt++;
 					if (value.getFetchTime() < start)
 						start = value.getFetchTime();
@@ -817,10 +806,9 @@ public class SegmentReader extends Configured implements
 		for (int i = 0; i < readers.length; i++) {
 			value = (Writable) valueClass.newInstance();
 			Text aKey = (Text) keyClass.newInstance();
-			//System.out.println("=====URL is======="+aKey.toString()+"=============");
 			while (readers[i].next(aKey, value)) { 
 			
-				//writing the content into files of urls which other than 302 ,400,500 
+				//writing the content into files of urls which have response code 200 
 				if(!urlResponseCodes.containsKey(aKey.toString())) {
 					String keyString = aKey.toString();
 					String[] split = keyString.split(domainVO.getUrl());
@@ -850,25 +838,7 @@ public class SegmentReader extends Configured implements
 						if(urlResponseCodes.get(aKey.toString())!= null){
 							message = statusMessages.getStatusMessage(urlResponseCodes.get(aKey.toString()));
 						}
-						//System.out.println("In else block=====URL IS==="+url+"==="+urlResponseCodes.get(aKey.toString())+"======");
-						/*switch (urlResponseCodes.get(aKey.toString())) {
-							case 12:
-									message = "Moved Permanently";
-									break;
-							case 13:
-									message = "Moved Temporarily";
-									break;
-							case 14:
-									message = "Page Not Found";
-									break;
-							case 16:
-									message = "Internal Server Error";
-									break;
-
-						default:
-							break;
-						}
-						*/
+						
 						URLTransformationUtil uUtil = new URLTransformationUtil();
 						uUtil.updateLastFetchTime(message,url,crawlId);
 				}

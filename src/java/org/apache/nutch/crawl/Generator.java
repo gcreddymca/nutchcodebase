@@ -152,6 +152,7 @@ public class Generator extends Configured implements Tool {
 		int currentsegmentnum = 1;
 		private Configuration conf;
 		private List<DomainVO> domainList = new ArrayList<DomainVO>();
+		//private DomainVO domainVO = new DomainVO();
 		private Map<String,UrlVO> urlMap;
 
 		public void configure(JobConf job) {
@@ -189,8 +190,9 @@ public class Generator extends Configured implements Tool {
 			conf = NutchConfiguration.create();
 			// Read domains from Db
 			if (conf.getBoolean("generate.save.urls.in.segments", false)) {
-				domainList = domainDao.read();
+				domainList = domainDao.read(domainId);
 				UrlDAO urlDAO = new UrlDAO();
+				
 				urlMap = urlDAO.read(domainId);
 				// Read segments for each domain and update DomainList with
 				// corresponding segmentListVos
@@ -199,16 +201,13 @@ public class Generator extends Configured implements Tool {
 					//segmentList.clear();
 					segmentList = domainDao.readSegmentsFromDomain(domain
 							.getDomainId());
-					//SegmentVO defaultSeg = segmentList.get(0);
-					//commented as part of default segment priority changed to 9999
-					/*if(defaultSeg.getSegmentName().equalsIgnoreCase("default")) {
-						segmentList.remove(0);
-						segmentList.add(defaultSeg);
-					}*/
+					
 
 					domain.setSegmentVOs(segmentList);
 
 				}
+				
+			
 
 			}
 
@@ -314,7 +313,6 @@ public class Generator extends Configured implements Tool {
 			UrlDAO urlCrud = new UrlDAO();
 			Set<UrlVO> urlList = new HashSet<UrlVO>();
 			Set<UrlVO> urlListDef = new HashSet<UrlVO>();
-
 			while (values.hasNext()) {
 				UrlVO urlVO = new UrlVO();
 				UrlVO urlVODef = new UrlVO();
@@ -405,23 +403,17 @@ public class Generator extends Configured implements Tool {
 				}
 				if (conf.getBoolean("generate.save.urls.in.segments", false)) {
 					String urlToSave = url.toString();
-					//String urlWithoutSlash = null;
+					
 					
 					// Iterate through all domain and find the domain which
-					// matches the url
+				
+					
 					for (DomainVO domain : domainList) {
 						// if match found
+						if (urlToSave.startsWith(domain.getUrl())) {
 						
-						if (urlToSave.startsWith(domain.getUrl()+domain.getSeedUrl())) {
-							
-							/*String seedUrlInDomain = domain.getUrl();
-							if(domain.getUrl().lastIndexOf("/") != -1) {
-								if(domain.getUrl().substring(domain.getUrl().lastIndexOf("/")+1).length() > 0) 
-									seedUrlInDomain =  domain.getUrl().substring(domain.getUrl().lastIndexOf("/"));
-								
-							}*/
 							StringTokenizer sTokens = new StringTokenizer(domain.getSeedUrl(), " ");
-							List seedUrls = new ArrayList<String>();
+							List<String> seedUrls = new ArrayList<String>();
 							while(sTokens.hasMoreTokens()){
 								seedUrls.add(sTokens.nextToken());
 							}
@@ -429,9 +421,7 @@ public class Generator extends Configured implements Tool {
 							String domainUrl = extractDomainIfIncludesSeedUrl(domain.getUrl());
 							// rip out domain Name from Url
 							urlToSave = urlToSave.replaceAll(domain.getUrl(),"");
-							/*if(urlToSave.endsWith("/")){
-								urlWithoutSlash = urlToSave.substring(0, urlToSave.length()-1);
-							}*/
+							
 							if(urlToSave.length() == 0){
 								urlToSave = "/";
 							}
@@ -456,16 +446,7 @@ public class Generator extends Configured implements Tool {
 											// create urlVO for each url
 											urlVO.setSegmentId(segment
 													.getSegmentId());
-											//adding "/" at the end of the url
-											/*if(!urlToSave.endsWith(".jsp")){
-												if(!urlToSave.endsWith("/")){
-													urlVO.setUrl(urlToSave+"/");
-												}else{
-													urlVO.setUrl(urlToSave);
-												}
-											}else{
-											urlVO.setUrl(urlToSave);
-											}*/
+											
 											urlVO.setUrl(urlToSave);
 											urlList.add(urlVO);
 											urlMap.put(urlToSave, urlVO);
@@ -483,15 +464,7 @@ public class Generator extends Configured implements Tool {
 									// create urlVO for each url
 									urlVODef.setSegmentId(segment
 											.getSegmentId());
-									/*if(!urlToSave.endsWith(".jsp")){
-										if(!urlToSave.endsWith("/")){
-											urlVODef.setUrl(urlToSave+"/");
-										}else{
-											urlVODef.setUrl(urlToSave);
-										}
-									}else{
-										urlVODef.setUrl(urlToSave);
-									}*/
+								
 									urlVODef.setUrl(urlToSave);
 									if (!(urlMap.containsKey(urlToSave)
 											|| urlMap

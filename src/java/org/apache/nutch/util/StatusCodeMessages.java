@@ -13,11 +13,11 @@ public String getStatusMessage(int code){
 							message = "Content was not retrieved";
 							break;
 					case 10:
-						message = "Protocol was not found";
-						break;
+							message = "Protocol was not found";
+							break;
 					case 11:
-						message = "Resource is gone";
-						break;
+							message = "Resource is gone";
+							break;
 					case 12:
 							message = "Moved Permanently";
 							break;
@@ -28,20 +28,20 @@ public String getStatusMessage(int code){
 							message = "Page Not Found";
 							break;
 					case 15:
-						message = "Temporary failure";
-						break;
+							message = "Temporary failure";
+							break;
 					case 16:
 							message = "Internal Server Error";
 							break;
 					case 17:
-						message = "Access denied";
-						break;
+							message = "Access denied";
+							break;
 					case 18:
-						message = "Access denied by robots.txt rules";
-						break;
+							message = "Access denied by robots.txt rules";
+							break;
 					case 19:
-						message = "Too many redirects";
-						break;
+							message = "Too many redirects";
+							break;
 					case 20:
 							message = "Not fetching";
 							break;
@@ -52,8 +52,8 @@ public String getStatusMessage(int code){
 							message = "Request refused by protocol plugins";
 							break;
 					case 23:
-						message = "Thread was blocked";
-						break;
+							message = "Thread was blocked";
+							break;
 					
 					default:
 							break;

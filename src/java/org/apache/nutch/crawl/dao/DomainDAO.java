@@ -30,7 +30,7 @@ public class DomainDAO {
 		try {
 			stmt = conn.createStatement();
 			String query = " SELECT * FROM SEGMENT_MASTER MASTER WHERE DOMAIN_ID="
-					+ domainId + "ORDER BY PRIORITY";
+					+ domainId + " ORDER BY PRIORITY";
 			boolean success = stmt.execute(query);
 			if (success) {
 				ResultSet rs = stmt.getResultSet();
@@ -71,6 +71,9 @@ public class DomainDAO {
 	}
 
 	public List<DomainVO> read() {
+		return read(0);
+	}
+	public List<DomainVO> read(int domainId) {
 		Connection conn = JDBCConnector.getConnection();
 		List<DomainVO> result = null;
 		if (conn == null) {
@@ -80,7 +83,13 @@ public class DomainDAO {
 		Statement stmt = null;
 		try {
 			stmt = conn.createStatement();
-			String query = " SELECT * FROM DOMAIN ORDER BY DOMAIN_NAME desc";
+			String query = null;
+			if(domainId == 0) {
+				query = " SELECT * FROM DOMAIN ORDER BY DOMAIN_NAME desc";
+			}else{
+				query = " SELECT * FROM DOMAIN WHERE DOMAIN_ID="+domainId;
+			}
+			
 			boolean success = stmt.execute(query);
 			if (success) {
 				ResultSet rs = stmt.getResultSet();
