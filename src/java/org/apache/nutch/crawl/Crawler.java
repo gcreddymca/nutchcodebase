@@ -88,10 +88,12 @@ public class Crawler {
 			seedUrlsToken = seedUrls.nextToken();
 			writer.write(domainVO.getUrl() + seedUrlsToken );
 			writer.write(System.getProperty( "line.separator" ));
-			if(domainVO.getSeedUrl().trim().length() > 1)
+			if(domainVO.getSeedUrl().trim().length() > 1) {
 				allowedUrls.append("+^" + domainVO.getUrl() + seedUrlsToken + "\n");
-			else
+			}
+			else {
 				allowedUrls.append("+^" + domainVO.getUrl());
+			}
 		}
 		
 		writer.flush();
@@ -117,7 +119,8 @@ public class Crawler {
 		}
 		else if(segmentUrlRules!=null && segmentUrlRules.size()>0){
 			for(String urlRule : segmentUrlRules){
-				regexString.append("-^" + domainVO.getUrl()+ "/" + urlRule+"\n");
+					regexString.append("-^" + domainVO.getUrl()+ "/" + urlRule+"\n");
+				
 			}
 		}
 		

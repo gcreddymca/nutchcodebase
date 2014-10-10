@@ -15,9 +15,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.nutch.crawl.dao.DomainDAO;
 import org.apache.nutch.tools.JDBCConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+
 
 public class URLTransformationUtil {
 	private static final Configuration conf;
@@ -445,7 +448,7 @@ public class URLTransformationUtil {
 			Statement stmt = null;
 			try {
 				stmt= conn.createStatement();
-				String query = "UPDATE URL_HTML_LOC SET LAST_FETCH_TIME= '"+ date+"', HTML_FILE_STATUS='0' WHERE URL= '"+url+"' and  CRAWL_ID= "+crawlId;
+				String query = "UPDATE URL_HTML_LOC SET LAST_FETCH_TIME= '"+ date+"', HTML_FILE_STATUS='0',IS_HTMLIZED= '1' WHERE URL= '"+url+"' and  CRAWL_ID= "+crawlId;
 				//stmt.execute(query);
 				stmt.executeUpdate(query);
 				conn.commit();
@@ -526,7 +529,7 @@ public class URLTransformationUtil {
 			Statement stmt =null;
 			try {
 				stmt = conn.createStatement();
-				String query = "UPDATE URL_HTML_LOC SET LAST_FETCH_TIME= '"+ message+"', HTML_FILE_STATUS='0' WHERE URL= '"+url+"' and  CRAWL_ID= "+crawlId;
+				String query = "UPDATE URL_HTML_LOC SET LAST_FETCH_TIME= '"+ message+"', HTML_FILE_STATUS= '0', IS_HTMLIZED= '0' WHERE URL= '"+url+"' and  CRAWL_ID= "+crawlId;
 				stmt.execute(query);
 				conn.commit();
 			} catch (SQLException e) {
@@ -550,6 +553,86 @@ public class URLTransformationUtil {
 			
 		
 		}
+	
+	public String getSpecificURLHTMLLOC(String url, int crawlId) {
+		String url_loc = null;
+		//boolean connCreated = false;
+		Connection conn = JDBCConnector.getConnection();
+		if (conn != null) {
+		  Statement stmt = null;
+		  ResultSet rs = null;
+		 try{
+			 stmt = conn.createStatement();
+			 String query = "SELECT URL_LOC FROM URL_HTML_LOC WHERE url= '"+url+"' and CRAWL_ID="+crawlId;
+			 rs = stmt.executeQuery(query);
+			 
+			 if(rs.next()){
+				 url_loc = rs.getString("URL_LOC");
+				 
+			 }
+		} catch(SQLException e){
+			 LOG.error("Error in getUrlHtmlLoc method:"+e.getMessage());
+		}
+		 finally {
+			try {
+				if (stmt != null) {
+				stmt.close();
+				rs.close();
+				}
+				if(conn != null){
+					conn.close();
+				}
+			}catch (SQLException e) {
+				LOG.error("Error while closing connection "+e.getMessage()); 
+			}
+			}
+		}
+		return url_loc;
+	}
+	
+	
+	//Delete URL HTML File Process
+	public void deleteOldHtmlFile(String url, int crawlId,int domainId){
+		LOG.info("Old URL to be Delete:["+url+"]");
+		org.apache.nutch.crawl.vo.DomainVO domainVo = new org.apache.nutch.crawl.vo.DomainVO();
+		DomainDAO domainCrud = new DomainDAO();
+		//DomainVO domainVo = new org.apache.nutch.crawl.vo.DomainVO();
+		//DomainMasterCRUD domainCrud = new DomainMasterCRUD();
+		//CrawlUtil cUtil = new CrawlUtil();
+		String domainPath=null;
+	//	Connection conn = null;
+		try{
+			//conn = JDBCConnector.getConnection();
+			//int crawlId = cUtil.getCrawlId(conn,domainId);
+			domainVo = domainCrud.readByPrimaryKey(domainId);
+			String urlLoc = getSpecificURLHTMLLOC(url, crawlId);
+			domainPath=domainVo.getUrl();
+			if(urlLoc.contains(domainPath)){
+				urlLoc = urlLoc.replace(domainPath, "");
+			}
+			File file = null;
+			file = new File(domainVo.getFinal_content_directory()+urlLoc);
+			if(file.exists()){
+	    		if(file.delete()){
+	    			//cUtil.deleteTimeStamptoURL(urlLoc,crawlId);
+	    			LOG.info(file + " is deleted!");
+	    		}else{
+	    			LOG.error("File is Not available:"+file);
+	    		}
+			}
+		}catch(Exception e){
+			LOG.error("Error while deleting old URL Html file:"+e.getMessage());
+		}/*finally {
+			try {
+			     if(conn != null){
+			    	 conn.close();
+                 } 
+				}
+			 catch (SQLException e) {
+				LOG.info("Error while closing connection in delete old URLHtml File process:" + e);
+			}
+		}*/
+	}
 		
 	}
 

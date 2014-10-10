@@ -509,13 +509,13 @@ public class Generator extends Configured implements Tool {
 			String seedUrl = null;
 			boolean matchFound = false;
 			while(itr.hasNext()) {
-				seedUrl = itr.next();
-				if(patternRule.length() == 1) {
+				seedUrl = itr.next();   
+				/*if(patternRule.length() == 1) {
 					matchFound = (url.matches(seedUrl));
 					if(matchFound)
 						break;
 				}
-				else if(url.matches(patternRule)) {
+				else*/ if(url.matches(patternRule)) {
 					matchFound = true;
 					if(matchFound)
 						break;

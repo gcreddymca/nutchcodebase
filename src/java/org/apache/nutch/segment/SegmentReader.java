@@ -841,6 +841,7 @@ public class SegmentReader extends Configured implements
 						
 						URLTransformationUtil uUtil = new URLTransformationUtil();
 						uUtil.updateLastFetchTime(message,url,crawlId);
+						uUtil.deleteOldHtmlFile(url, crawlId, domainId);
 				}
 			}
 		}

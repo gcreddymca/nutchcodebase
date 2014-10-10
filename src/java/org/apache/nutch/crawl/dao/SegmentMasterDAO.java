@@ -171,7 +171,7 @@ public class SegmentMasterDAO {
 	  Statement stmt = null;
 	  try {
 	   stmt = conn.createStatement();
-	   String query = "SELECT * from SEGMENT_MASTER where DOMAIN_ID="+domainId+" AND CRAWL="+0;
+	   String query = "SELECT * from SEGMENT_MASTER where DOMAIN_ID="+domainId+" AND CRAWL=0";
 	   boolean success = stmt.execute(query);
 	   if (success) {
 	    ResultSet rs = stmt.getResultSet();

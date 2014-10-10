@@ -26,8 +26,6 @@ public class UrlDAO {
 	public boolean create(Set<UrlVO> urlVOs,int domainId) {
 		Connection conn = JDBCConnector.getConnection();
 		
-		CONNECTIONCOUNT++;
-		int connectioncount=CONNECTIONCOUNT;
 		int crawlId = getCrawlId(domainId);
 		if(crawlId == 0){
 			crawlId = getLiveCrawlId(domainId);
