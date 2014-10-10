@@ -605,20 +605,24 @@ public class URLTransformationUtil {
 			//conn = JDBCConnector.getConnection();
 			//int crawlId = cUtil.getCrawlId(conn,domainId);
 			domainVo = domainCrud.readByPrimaryKey(domainId);
-			String urlLoc = getSpecificURLHTMLLOC(url, crawlId);
-			domainPath=domainVo.getUrl();
-			if(urlLoc.contains(domainPath)){
-				urlLoc = urlLoc.replace(domainPath, "");
+			if(domainVo == null) {
+				return;
 			}
-			File file = null;
-			file = new File(domainVo.getFinal_content_directory()+urlLoc);
-			if(file.exists()){
-	    		if(file.delete()){
-	    			//cUtil.deleteTimeStamptoURL(urlLoc,crawlId);
-	    			LOG.info(file + " is deleted!");
-	    		}else{
-	    			LOG.error("File is Not available:"+file);
-	    		}
+			String urlLoc = getSpecificURLHTMLLOC(url, crawlId);
+			domainPath = domainVo.getUrl();
+			if(urlLoc != null && urlLoc.contains(domainPath)){
+				urlLoc = urlLoc.replace(domainPath, "");
+			
+				File file = null;
+				file = new File(domainVo.getFinal_content_directory()+urlLoc);
+				if(file.exists()){
+		    		if(file.delete()){
+		    			//cUtil.deleteTimeStamptoURL(urlLoc,crawlId);
+		    			LOG.info(file + " is deleted!");
+		    		}else{
+		    			LOG.error("File is Not available:"+file);
+		    		}
+				}
 			}
 		}catch(Exception e){
 			LOG.error("Error while deleting old URL Html file:"+e.getMessage());

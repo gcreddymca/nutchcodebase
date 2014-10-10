@@ -813,8 +813,8 @@ public class SegmentReader extends Configured implements
 					String keyString = aKey.toString();
 					String[] split = keyString.split(domainVO.getUrl());
 					String urlLink = split[1];
-					String defaultFolderHierarchy = RawHTMLFileCreationUtil.getDefaultFolderHierarchy(keyString, output);
-					String htmlFileName = RawHTMLFileCreationUtil.getRawHtmlContentFileName(keyString);
+					String defaultFolderHierarchy = RawHTMLFileCreationUtil.getDefaultFolderHierarchy(urlLink, output);
+					String htmlFileName = RawHTMLFileCreationUtil.getRawHtmlContentFileName(urlLink);
 					RawHTMLFileCreationUtil.createDirectories(defaultFolderHierarchy);
 					String newFileName = defaultFolderHierarchy + "/" + htmlFileName;
 					//Checking for content contains empty or not
