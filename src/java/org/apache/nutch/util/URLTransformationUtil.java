@@ -333,7 +333,8 @@ public class URLTransformationUtil {
 			if (!(extnMatcher.find())) {
 				if (hrefValue.contains(domainUrl)) {
 					hrefValue = hrefValue.replace(domainUrl, "");
-					rawHtml = rawHtml.replaceAll("[\"]"+tempValue+"[\"]", "\""+hrefValue+"\"");
+					//rawHtml = rawHtml.replaceAll("[\"]"+tempValue+"[\"]", "\""+hrefValue+"\"");
+					rawHtml = rawHtml.replace("\""+tempValue+"\"", "\""+hrefValue+"\"");
 				}
 			}
 		}
@@ -488,7 +489,8 @@ public class URLTransformationUtil {
 			hrefValue = excludeParameter(hrefValue);
 			// Replace href Value in the htmlContent if it doesn't contain any file extensions
 			if (!tempValue.equals(hrefValue)) {
-				rawHtml = rawHtml.replaceAll("[\"]"+tempValue+"[\"]", "\""+hrefValue+"\"");
+				//rawHtml = rawHtml.replaceAll("[\"]"+tempValue+"[\"]", "\""+hrefValue+"\"");
+				rawHtml = rawHtml.replace("\""+tempValue+"\"", "\""+hrefValue+"\"");
 			}
 		}
 		return rawHtml;
